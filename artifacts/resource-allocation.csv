@@ -1,0 +1,58 @@
+person,role,week_starting,workstream,allocation_pct
+D. Whitlock,Analytics Engineer,2026-09-07,Warehouse migration,80
+D. Whitlock,Analytics Engineer,2026-09-14,Warehouse migration,80
+D. Whitlock,Analytics Engineer,2026-09-21,Warehouse migration,90
+D. Whitlock,Analytics Engineer,2026-09-28,Warehouse migration,90
+D. Whitlock,Analytics Engineer,2026-10-05,Warehouse migration,70
+D. Whitlock,Analytics Engineer,2026-10-12,Warehouse migration,70
+D. Whitlock,Analytics Engineer,2026-10-19,Warehouse migration,60
+D. Whitlock,Analytics Engineer,2026-10-26,Warehouse migration,60
+D. Whitlock,Analytics Engineer,2026-11-02,Warehouse migration,60
+D. Whitlock,Analytics Engineer,2026-09-07,Run-the-business support (legacy loader),40
+D. Whitlock,Analytics Engineer,2026-09-14,Run-the-business support (legacy loader),40
+D. Whitlock,Analytics Engineer,2026-09-21,Run-the-business support (legacy loader),40
+D. Whitlock,Analytics Engineer,2026-09-28,Run-the-business support (legacy loader),50
+D. Whitlock,Analytics Engineer,2026-10-05,Run-the-business support (legacy loader),50
+D. Whitlock,Analytics Engineer,2026-10-12,Run-the-business support (legacy loader),50
+D. Whitlock,Analytics Engineer,2026-10-19,Run-the-business support (legacy loader),40
+D. Whitlock,Analytics Engineer,2026-10-26,Run-the-business support (legacy loader),40
+D. Whitlock,Analytics Engineer,2026-11-02,Run-the-business support (legacy loader),40
+D. Whitlock,Analytics Engineer,2026-10-05,Storefront feed migration,40
+D. Whitlock,Analytics Engineer,2026-10-12,Storefront feed migration,40
+D. Whitlock,Analytics Engineer,2026-10-19,Storefront feed migration,40
+D. Whitlock,Analytics Engineer,2026-10-26,Storefront feed migration,20
+M. Okonkwo,BI Developer,2026-09-07,Warehouse migration,90
+M. Okonkwo,BI Developer,2026-09-14,Warehouse migration,90
+M. Okonkwo,BI Developer,2026-09-21,Warehouse migration,90
+M. Okonkwo,BI Developer,2026-09-28,Warehouse migration,90
+M. Okonkwo,BI Developer,2026-10-05,Warehouse migration,90
+M. Okonkwo,BI Developer,2026-10-12,Warehouse migration,90
+M. Okonkwo,BI Developer,2026-10-19,Warehouse migration,60
+M. Okonkwo,BI Developer,2026-10-26,Warehouse migration,40
+M. Okonkwo,BI Developer,2026-11-02,Warehouse migration,40
+J. Reyes,Controller (Finance),2026-09-07,Warehouse migration,10
+J. Reyes,Controller (Finance),2026-09-14,Warehouse migration,10
+J. Reyes,Controller (Finance),2026-09-21,Warehouse migration,10
+J. Reyes,Controller (Finance),2026-09-28,Warehouse migration,10
+J. Reyes,Controller (Finance),2026-10-05,Warehouse migration,10
+J. Reyes,Controller (Finance),2026-10-12,Warehouse migration,10
+J. Reyes,Controller (Finance),2026-10-19,Warehouse migration,20
+J. Reyes,Controller (Finance),2026-10-26,Warehouse migration,20
+J. Reyes,Controller (Finance),2026-11-02,Warehouse migration,10
+J. Reyes,Controller (Finance),2026-10-05,Fiscal year-end close,90
+J. Reyes,Controller (Finance),2026-10-12,Fiscal year-end close,90
+J. Reyes,Controller (Finance),2026-10-19,Fiscal year-end close,60
+S. Alvear,Project Manager,2026-09-07,Warehouse migration,60
+S. Alvear,Project Manager,2026-09-14,Warehouse migration,60
+S. Alvear,Project Manager,2026-09-21,Warehouse migration,60
+S. Alvear,Project Manager,2026-09-28,Warehouse migration,60
+S. Alvear,Project Manager,2026-10-05,Warehouse migration,60
+S. Alvear,Project Manager,2026-10-12,Warehouse migration,60
+S. Alvear,Project Manager,2026-10-19,Warehouse migration,60
+S. Alvear,Project Manager,2026-10-26,Warehouse migration,60
+S. Alvear,Project Manager,2026-11-02,Warehouse migration,60
+R. Bekele,IT Security,2026-09-07,Warehouse migration,30
+R. Bekele,IT Security,2026-09-14,Warehouse migration,30
+R. Bekele,IT Security,2026-09-21,Warehouse migration,20
+R. Bekele,IT Security,2026-09-28,Warehouse migration,10
+R. Bekele,IT Security,2026-10-05,Warehouse migration,10

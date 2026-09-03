@@ -1,0 +1,14 @@
+task_id,task_name,owner,planned_start,planned_end,effort_days,depends_on,percent_complete,status
+T01,Source system inventory and profiling,D. Whitlock,2026-06-01,2026-07-10,28,,100,Complete
+T02,Build curated (gold) fact and dimension tables,D. Whitlock,2026-07-13,2026-09-25,55,T01,70,On track
+T03,Historical backfill and load validation,D. Whitlock,2026-09-14,2026-09-30,12,T02,0,Not started
+T04,Parallel run: legacy vs new warehouse,D. Whitlock,2026-10-01,2026-10-14,10,T03;T13,0,Not started
+T05,Reconciliation sign-off (Finance),J. Reyes,2026-10-15,2026-10-16,2,T04,0,Not started
+T06,Rebuild reporting layer (120 legacy reports),M. Okonkwo,2026-08-17,2026-10-09,40,,35,On track
+T07,User acceptance testing,M. Okonkwo,2026-10-05,2026-10-09,5,T06,0,Not started
+T08,Production cutover,D. Whitlock,2026-10-12,2026-10-12,1,T05;T07,0,Not started
+T09,Hypercare and stabilisation,D. Whitlock,2026-10-13,2026-10-30,14,T08,0,Not started
+T10,Training and organisational comms,S. Alvear,2026-09-28,2026-10-09,10,,20,On track
+T11,Legacy warehouse decommission,D. Whitlock,2026-11-02,2026-11-13,10,T09,0,Not started
+T12,Security and access review,R. Bekele,2026-09-07,2026-09-18,8,,60,On track
+T13,Storefront settlement feed migration (vendor),D. Whitlock,2026-10-05,2026-10-16,9,T02,0,Not started

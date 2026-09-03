@@ -1,0 +1,121 @@
+report_id,report_name,business_area,source,views_last_12m,last_viewed,platform
+RPT-001,Net revenue by title - copy,Revenue,Legacy EDW,0,,Legacy Portal
+RPT-002,Net revenue by title summary,Revenue,Legacy EDW,14,2026-07-20,Excel
+RPT-003,Net revenue by title APAC,Revenue,Legacy EDW,0,,Excel
+RPT-004,Net revenue by title by title,Revenue,Legacy EDW,0,,Legacy Portal
+RPT-005,Net revenue by title weekly,Revenue,Legacy EDW,0,,Excel
+RPT-006,Net revenue by title,Revenue,Legacy EDW,3,2026-08-31,SSRS
+RPT-007,Net revenue by storefront - copy,Revenue,Legacy EDW,1,2025-09-30,SSRS
+RPT-008,Net revenue by storefront APAC,Revenue,Legacy EDW,0,,Legacy Portal
+RPT-009,Net revenue by storefront (v2),Revenue,Legacy EDW,63,2026-06-23,Excel
+RPT-010,Net revenue by storefront 2024,Revenue,Legacy EDW,0,,Legacy Portal
+RPT-011,Net revenue by storefront summary,Revenue,Legacy EDW,0,,Legacy Portal
+RPT-012,Net revenue by storefront EMEA,Revenue,Excel extract,1,2024-03-14,Excel
+RPT-013,Daily bookings weekly,Revenue,Legacy EDW,26,2026-08-30,SSRS
+RPT-014,Daily bookings APAC,Revenue,Legacy EDW,3,2026-08-19,Excel
+RPT-015,Daily bookings 2024,Revenue,Legacy EDW,19,2026-08-24,SSRS
+RPT-016,Daily bookings daily,Revenue,Legacy EDW,0,,Legacy Portal
+RPT-017,Daily bookings archive,Revenue,Excel extract,0,,Excel
+RPT-018,Daily bookings by title,Revenue,Legacy EDW,8,2026-08-28,Excel
+RPT-019,Refund detail EMEA,Revenue,Excel extract,0,,Excel
+RPT-020,Refund detail archive,Revenue,Legacy EDW,0,,SSRS
+RPT-021,Refund detail by platform,Revenue,Legacy EDW,0,,Excel
+RPT-022,Refund detail FINAL,Revenue,Excel extract,0,,Legacy Portal
+RPT-023,Refund detail daily,Revenue,Legacy EDW,0,,SSRS
+RPT-024,Refund detail (v2),Revenue,Legacy EDW,0,,Excel
+RPT-025,Settlement reconciliation archive,Revenue,Legacy EDW,47,2026-08-11,SSRS
+RPT-026,Settlement reconciliation old,Revenue,Legacy EDW,0,,SSRS
+RPT-027,Settlement reconciliation,Revenue,Excel extract,0,,SSRS
+RPT-028,Settlement reconciliation by platform,Revenue,Legacy EDW,0,,SSRS
+RPT-029,Settlement reconciliation EMEA,Revenue,Excel extract,1,2024-05-17,Legacy Portal
+RPT-030,Settlement reconciliation - copy,Revenue,Legacy EDW,0,,SSRS
+RPT-031,Fiscal quarter close pack - copy,Finance,Legacy EDW,140,2026-06-28,SSRS
+RPT-032,Fiscal quarter close pack APAC,Finance,Legacy EDW,0,,SSRS
+RPT-033,Fiscal quarter close pack FINAL,Finance,Excel extract,2,2025-01-09,Excel
+RPT-034,Fiscal quarter close pack archive,Finance,Legacy EDW,0,,Excel
+RPT-035,Fiscal quarter close pack EMEA,Finance,Excel extract,140,2026-06-22,Excel
+RPT-036,Fiscal quarter close pack by platform,Finance,Excel extract,0,,Legacy Portal
+RPT-037,Platform fee analysis old,Finance,Legacy EDW,220,2026-06-27,Legacy Portal
+RPT-038,Platform fee analysis (v2),Finance,Legacy EDW,5,2026-06-17,Excel
+RPT-039,Platform fee analysis archive,Finance,Legacy EDW,26,2026-06-27,Excel
+RPT-040,Platform fee analysis - copy,Finance,Legacy EDW,0,,Excel
+RPT-041,Platform fee analysis 2024,Finance,Excel extract,5,2026-08-10,Excel
+RPT-042,Platform fee analysis daily,Finance,Legacy EDW,0,,Legacy Portal
+RPT-043,FX exposure old,Finance,Excel extract,2,2025-10-05,Excel
+RPT-044,FX exposure daily,Finance,Legacy EDW,8,2026-06-28,Excel
+RPT-045,FX exposure EMEA,Finance,Legacy EDW,0,,Excel
+RPT-046,FX exposure - copy,Finance,Legacy EDW,0,,Legacy Portal
+RPT-047,FX exposure detail,Finance,Legacy EDW,34,2026-08-10,Excel
+RPT-048,FX exposure by platform,Finance,Legacy EDW,26,2026-07-30,Excel
+RPT-049,Studio scorecard archive,Studio Ops,Legacy EDW,0,,Legacy Portal
+RPT-050,Studio scorecard APAC,Studio Ops,Excel extract,2,2025-02-17,Legacy Portal
+RPT-051,Studio scorecard weekly,Studio Ops,Legacy EDW,1,2025-10-17,Excel
+RPT-052,Studio scorecard detail,Studio Ops,Legacy EDW,0,,SSRS
+RPT-053,Studio scorecard EMEA,Studio Ops,Legacy EDW,1,2024-11-11,Legacy Portal
+RPT-054,Studio scorecard (v2),Studio Ops,Legacy EDW,2,2025-09-24,Legacy Portal
+RPT-055,Title launch tracker weekly,Studio Ops,Legacy EDW,1,2024-11-10,Legacy Portal
+RPT-056,Title launch tracker by title,Studio Ops,Legacy EDW,0,,Excel
+RPT-057,Title launch tracker (v2),Studio Ops,Legacy EDW,0,,Legacy Portal
+RPT-058,Title launch tracker 2024,Studio Ops,Legacy EDW,2,2024-10-29,SSRS
+RPT-059,Title launch tracker - copy,Studio Ops,Legacy EDW,19,2026-08-24,Excel
+RPT-060,Title launch tracker FINAL,Studio Ops,Legacy EDW,0,,Legacy Portal
+RPT-061,Paying player cohorts by platform,Player,Excel extract,2,2024-04-06,Legacy Portal
+RPT-062,Paying player cohorts - copy,Player,Excel extract,11,2026-08-19,Excel
+RPT-063,Paying player cohorts FINAL,Player,Legacy EDW,47,2026-08-08,Excel
+RPT-064,Paying player cohorts APAC,Player,Legacy EDW,2,2025-10-20,Excel
+RPT-065,Paying player cohorts by title,Player,Legacy EDW,0,,Legacy Portal
+RPT-066,Paying player cohorts EMEA,Player,Legacy EDW,2,2024-12-14,Excel
+RPT-067,Acquisition channel mix 2024,Player,Legacy EDW,0,,SSRS
+RPT-068,Acquisition channel mix by title,Player,Legacy EDW,0,,Legacy Portal
+RPT-069,Acquisition channel mix weekly,Player,Legacy EDW,19,2026-06-19,Legacy Portal
+RPT-070,Acquisition channel mix old,Player,Legacy EDW,2,2024-03-24,SSRS
+RPT-071,Acquisition channel mix FINAL,Player,Excel extract,140,2026-08-06,Excel
+RPT-072,Acquisition channel mix detail,Player,Excel extract,14,2026-08-23,Legacy Portal
+RPT-073,Country mix daily,Player,Legacy EDW,0,,Legacy Portal
+RPT-074,Country mix by platform,Player,Legacy EDW,0,,Excel
+RPT-075,Country mix FINAL,Player,Legacy EDW,26,2026-07-13,Excel
+RPT-076,Country mix old,Player,Excel extract,0,,Excel
+RPT-077,Country mix by title,Player,Legacy EDW,1,2025-08-28,SSRS
+RPT-078,Country mix,Player,Legacy EDW,220,2026-06-19,SSRS
+RPT-079,Refund reason breakdown FINAL,Support,Excel extract,11,2026-08-04,SSRS
+RPT-080,Refund reason breakdown by platform,Support,Legacy EDW,1,2024-07-21,Excel
+RPT-081,Refund reason breakdown by title,Support,Excel extract,1,2025-05-07,Excel
+RPT-082,Refund reason breakdown EMEA,Support,Legacy EDW,14,2026-07-19,Excel
+RPT-083,Refund reason breakdown (v2),Support,Legacy EDW,0,,SSRS
+RPT-084,Refund reason breakdown archive,Support,Legacy EDW,140,2026-08-25,Excel
+RPT-085,Chargeback watchlist APAC,Support,Excel extract,0,,Excel
+RPT-086,Chargeback watchlist weekly,Support,Legacy EDW,1,2025-08-30,Excel
+RPT-087,Chargeback watchlist detail,Support,Legacy EDW,1,2025-05-19,SSRS
+RPT-088,Chargeback watchlist archive,Support,Legacy EDW,0,,Legacy Portal
+RPT-089,Chargeback watchlist,Support,Legacy EDW,0,,SSRS
+RPT-090,Chargeback watchlist - copy,Support,Legacy EDW,220,2026-08-31,Excel
+RPT-091,Campaign attribution daily,Marketing,Legacy EDW,0,,Legacy Portal
+RPT-092,Campaign attribution archive,Marketing,Legacy EDW,34,2026-07-04,SSRS
+RPT-093,Campaign attribution EMEA,Marketing,Excel extract,0,,Excel
+RPT-094,Campaign attribution FINAL,Marketing,Excel extract,0,,Excel
+RPT-095,Campaign attribution old,Marketing,Legacy EDW,63,2026-07-29,Excel
+RPT-096,Campaign attribution 2024,Marketing,Legacy EDW,14,2026-06-20,Legacy Portal
+RPT-097,Wishlist funnel weekly,Marketing,Legacy EDW,0,,SSRS
+RPT-098,Wishlist funnel by platform,Marketing,Legacy EDW,1,2025-04-11,SSRS
+RPT-099,Wishlist funnel daily,Marketing,Legacy EDW,0,,Legacy Portal
+RPT-100,Wishlist funnel - copy,Marketing,Excel extract,0,,Excel
+RPT-101,Wishlist funnel 2024,Marketing,Excel extract,140,2026-08-18,Legacy Portal
+RPT-102,Wishlist funnel old,Marketing,Legacy EDW,0,,SSRS
+RPT-103,Monthly business review pack APAC,Exec,Legacy EDW,5,2026-06-21,Legacy Portal
+RPT-104,Monthly business review pack EMEA,Exec,Legacy EDW,2,2024-11-27,Excel
+RPT-105,Monthly business review pack (v2),Exec,Legacy EDW,0,,Excel
+RPT-106,Monthly business review pack by title,Exec,Legacy EDW,0,,SSRS
+RPT-107,Monthly business review pack,Exec,Legacy EDW,0,,Excel
+RPT-108,Monthly business review pack by platform,Exec,Excel extract,0,,Legacy Portal
+RPT-109,Board summary old,Exec,Excel extract,220,2026-07-13,Legacy Portal
+RPT-110,Board summary detail,Exec,Legacy EDW,1,2025-10-01,SSRS
+RPT-111,Board summary - copy,Exec,Legacy EDW,0,,SSRS
+RPT-112,Board summary weekly,Exec,Excel extract,19,2026-07-07,Legacy Portal
+RPT-113,Board summary FINAL,Exec,Excel extract,0,,Legacy Portal
+RPT-114,Board summary APAC,Exec,Excel extract,2,2024-03-14,Excel
+RPT-115,Weekly flash 2024,Exec,Legacy EDW,0,,SSRS
+RPT-116,Weekly flash weekly,Exec,Legacy EDW,0,,Legacy Portal
+RPT-117,Weekly flash FINAL,Exec,Excel extract,19,2026-07-21,Legacy Portal
+RPT-118,Weekly flash detail,Exec,Legacy EDW,2,2025-04-02,Excel
+RPT-119,Weekly flash old,Exec,Legacy EDW,2,2025-10-21,Legacy Portal
+RPT-120,Weekly flash (v2),Exec,Legacy EDW,88,2026-08-31,SSRS
