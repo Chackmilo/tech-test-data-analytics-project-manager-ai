@@ -199,11 +199,25 @@ milestones = {}
 for cells in md_rows(status):
     if len(cells) == 2 and "Date" not in cells[1]:
         milestones[re.sub(r"[*]", "", cells[0]).strip()] = cells[1].strip()
-check("milestone table lists cutover", milestones.get("Production cutover"), "**12 October**")
-check("milestone table lists parallel run complete", milestones.get("Parallel run complete"), "14 October")
+MONTHS = {"January": 1, "February": 2, "March": 3, "April": 4, "May": 5, "June": 6,
+          "July": 7, "August": 8, "September": 9, "October": 10, "November": 11, "December": 12}
+
+
+def milestone_date(label, year=2026):
+    """Parse a '12 October' style milestone cell from the status report."""
+    m = re.search(r"(\d{1,2}) ([A-Z][a-z]+)", milestones[label])
+    return date(year, MONTHS[m.group(2)], int(m.group(1)))
+
+
+ms_cutover = milestone_date("Production cutover")
+ms_parallel = milestone_date("Parallel run complete")
+check("cutover date parsed from the milestone table", ms_cutover, date(2026, 10, 12))
+check("parallel-run completion parsed from the milestone table", ms_parallel, date(2026, 10, 14))
 # Finding 4: the committee was shown go-live BEFORE its own testing finished.
-check("status report shows cutover before parallel run completes (Finding 4)",
-      date(2026, 10, 12) < date(2026, 10, 14), True)
+# Both operands come from the artifact, so editing either milestone breaks this.
+check("status report published cutover BEFORE parallel run completes (Finding 4)",
+      ms_cutover < ms_parallel, True)
+check("days by which go-live preceded its own testing", (ms_parallel - ms_cutover).days, 2)
 
 # Finding 4: R-03 downgraded despite the notice predating the report.
 r03 = [c for c in md_rows(status) if c and c[0] == "R-03"][0]
@@ -374,6 +388,7 @@ check("defensible expectation for any unprioritised 42",
 section("8. Revised plan - PARSED FROM PLAN.md, not hardcoded")
 # ===========================================================================
 plan_md = text("PLAN.md", ROOT)
+mbr_text = text("MBR.md", ROOT)
 
 wbs = {}
 for cells in md_rows(plan_md):
@@ -393,6 +408,26 @@ for cells in md_rows(plan_md):
     wbs[key] = (start, end, int(eff), workdays(start, end), int(published_float), cells[2])
 
 check("WBS rows parsed out of PLAN.md", len(wbs) >= 18, True)
+
+# Every dated row, including the ones whose id column is an em-dash. These are
+# the cutover windows, and the previous version of this harness could not see
+# them at all.
+dated_rows = []
+for cells in md_rows(plan_md):
+    if len(cells) < 5:
+        continue
+    start, end = cells[3].strip(), cells[4].strip()
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", start) or not re.match(r"^\d{4}-\d{2}-\d{2}$", end):
+        continue
+    effort = cells[5].strip() if len(cells) > 5 else ""
+    is_milestone = num(effort) is None
+    dated_rows.append((re.sub(r"[*`]", "", cells[1]).strip(), start, end, is_milestone))
+
+check("dated rows parsed from PLAN.md (WBS plus milestone rows)", len(dated_rows) >= 26, True)
+check("cutover and soak rows are visible to this harness",
+      sorted({n for n, s_, e_, ms in dated_rows if ms}),
+      ["Cutover, year-end shutdown", "Ledger flip / go-live", "Soak, legacy authoritative",
+       "Technical cutover"])
 
 for tid, (s, e, eff, win, published, owner) in sorted(wbs.items()):
     check("PLAN.md %-6s float = %2d wd window - %2d effort" % (tid, win, eff), win - eff, published)
@@ -415,28 +450,99 @@ for tid, (s, e, eff, win, f, owner) in sorted(wbs.items()):
         overlaps_pto = s <= PTO_END and e >= PTO_START
         check("PLAN.md %s avoids Whitlock's PTO" % tid, overlaps_pto, False)
 
+# ---------------------------------------------------------------------------
+# DECLARED OUTSIDE KNOWLEDGE. None of this is in artifacts/. It is stated here
+# rather than assumed silently, because it constrains the schedule and a reader
+# is entitled to see exactly which non-artifact facts the plan depends on.
+#   - US Thanksgiving is the fourth Thursday of November; the Thanksgiving to
+#     Cyber Monday window is the peak trading period for digital game sales.
+#   - 1 January is a public holiday.
+# ---------------------------------------------------------------------------
+DECLARED_HOLIDAYS = {date(2027, 1, 1)}
+
+
+def first_business_day(year, month):
+    for x in range(1, 9):
+        d = date(year, month, x)
+        if d.weekday() < 5 and d not in DECLARED_HOLIDAYS:
+            return d
+
+
 # Peak trading: no cutover window may touch Thanksgiving-Cyber Monday.
 PEAK = (THANKSGIVING.isoformat(), (THANKSGIVING + timedelta(days=4)).isoformat())
 check("peak trading window derived from the calendar", PEAK, ("2026-11-26", "2026-11-30"))
-cutover_windows = re.findall(r"\*\*(\d{4}-\d{2}-\d{2})\*\* \| \*\*(\d{4}-\d{2}-\d{2})\*\*", plan_md)
-for s, e in cutover_windows:
-    check("declared window %s..%s clears the peak" % (s, e), e < PEAK[0] or s > PEAK[1], True)
+cutover_windows = [(n, s_, e_) for n, s_, e_, ms in dated_rows
+                   if ms and re.search(r"cutover", n, re.I)]
+check("cutover windows found to test", len(cutover_windows), 2)
+for name, s_, e_ in cutover_windows:
+    check("'" + name + "' (" + s_ + ".." + e_ + ") clears the peak trading window",
+          e_ < PEAK[0] or s_ > PEAK[1], True)
 
-# Scenario dates the documents commit to.
-check("Scenario A go-live is a Tuesday", date(2026, 12, 1).strftime("%a"), "Tue")
-check("Scenario A go-live is the first business day of December",
-      min(d for d in (date(2026, 12, x) for x in range(1, 8)) if d.weekday() < 5), date(2026, 12, 1))
-check("Scenario B go-live is a Monday", date(2027, 1, 4).strftime("%a"), "Mon")
-check("Scenario B go-live is the first Monday of 2027",
-      min(d for d in (date(2027, 1, x) for x in range(1, 8)) if d.weekday() == 0), date(2027, 1, 4))
+# The soak is the one window that SHOULD span the peak: the new platform runs it
+# while legacy stays the book of record. Assert the design, don't assume it.
+soak = [(s_, e_) for n, s_, e_, ms in dated_rows if re.search(r"soak", n, re.I)]
+check("a soak window exists in Scenario A", len(soak), 1)
+check("the soak deliberately covers the whole peak weekend",
+      soak[0][0] <= PEAK[0] and soak[0][1] >= PEAK[1], True)
+
+# No task of any kind may run during Whitlock's PTO or inside the vendor freeze.
+for name, s_, e_, ms in dated_rows:
+    # The freeze blocks new integrations and credential rotation. Internal work
+    # (backfill, reporting) is unaffected, so only vendor-touching and cutover
+    # activities are tested here.
+    if re.search(r"cutover|soak|ledger|settlement|vendor", name, re.I):
+        check("'" + name + "' avoids the vendor freeze",
+              s_ <= FREEZE_END and e_ >= FREEZE_START, False)
+
+# Scenario dates: parsed from what PLAN.md actually publishes, in two places,
+# which must agree with each other and with the calendar.
+hdr = re.search(r"\*\*Recommended cutover:\*\* \*\*(\w+ \d{1,2} \w+ \d{4})\*\*[^*]*"
+                r"\*\*(\w+ \d{1,2} \w+ \d{4})\*\*", plan_md)
+check("PLAN.md header declares two recommended dates", hdr is not None, True)
+
+
+def spelled(txt):
+    m = re.search(r"(\d{1,2}) (\w+) (\d{4})", txt)
+    return date(int(m.group(3)), MONTHS[m.group(2)], int(m.group(1)))
+
+
+GOLIVE_A, GOLIVE_B = spelled(hdr.group(1)), spelled(hdr.group(2))
+row = [c for c in md_rows(plan_md) if c and "Business go-live" in c[0]][0]
+check("scenario table agrees with the header on Scenario A", spelled(row[1]), GOLIVE_A)
+check("scenario table agrees with the header on Scenario B", spelled(row[2]), GOLIVE_B)
+MONTH_NAMES = {v: k for k, v in MONTHS.items()}
+
+
+def spell(d):
+    return "%d %s %d" % (d.day, MONTH_NAMES[d.month], d.year)
+
+
+check("MBR quotes the same two go-live dates as PLAN.md",
+      spell(GOLIVE_A) in mbr_text and spell(GOLIVE_B) in mbr_text, True)
+check("CFO message quotes them too",
+      spell(GOLIVE_A) in text("CFO_MESSAGE.md", ROOT).replace("Tuesday ", "").replace("Monday ", "")
+      or "1 December" in text("CFO_MESSAGE.md", ROOT), True)
+
+# Both dates must be the first business day of their month - that is the whole
+# ledger argument. A mid-month date fails here.
+for label, gl in [("A", GOLIVE_A), ("B", GOLIVE_B)]:
+    check("Scenario " + label + " go-live is its month's FIRST business day, not the last",
+          gl, first_business_day(gl.year, gl.month))
+    check("Scenario " + label + " go-live is not inside the peak trading window",
+          PEAK[0] <= gl.isoformat() <= PEAK[1], False)
+
+check("Scenario A go-live is a Tuesday", GOLIVE_A.strftime("%a"), "Tue")
+check("Scenario A go-live parsed as", GOLIVE_A, date(2026, 12, 1))
+check("Scenario B go-live is a Monday", GOLIVE_B.strftime("%a"), "Mon")
+check("Scenario B go-live parsed as", GOLIVE_B, date(2027, 1, 4))
 check("1 Jan 2027 falls on a Friday, so the New Year holiday buffers go-live",
       date(2027, 1, 1).strftime("%a"), "Fri")
 check("Scenario B cutover window sits in the year-end shutdown",
       workdays("2026-12-28", "2026-12-31"), 4)
 check("30 November is November's LAST business day, not December's first",
       max(d for d in (date(2026, 11, x) for x in range(1, 31)) if d.weekday() < 5), date(2026, 11, 30))
-check("slip to Scenario A (weeks)", round((date(2026, 12, 1) - date(2026, 10, 12)).days / 7.0, 1), 7.1)
-check("slip to Scenario B (weeks)", round((date(2027, 1, 4) - date(2026, 10, 12)).days / 7.0, 1), 12.0)
+check("slip to Scenario A (weeks)", round((GOLIVE_A - date.fromisoformat(CUTOVER)).days / 7.0, 1), 7.1)
+check("slip to Scenario B (weeks)", round((GOLIVE_B - date.fromisoformat(CUTOVER)).days / 7.0, 1), 12.0)
 
 # September capacity for Whitlock under the 80/20 split.
 t02 = wbs["T02"]
@@ -455,6 +561,21 @@ for tid in sorted(t for t in wbs if t.startswith("T12b")):
     if m:
         check("PLAN.md " + tid + " FTE " + m.group(1) + "% delivers its " + str(eff) + "d in "
               + str(win) + " wd", int(m.group(1)) >= needed, True)
+
+# Section 6 budget table must agree with the section 3 WBS on staffing.
+uplift = [c for c in md_rows(plan_md) if c and c[0].strip() == "Security uplift"]
+check("PLAN.md publishes a security uplift row", len(uplift), 1)
+budget_fte = [int(m) for m in re.findall(r"\u2192 (\d+)%", " | ".join(uplift[0]))]
+wbs_fte = [int(re.search(r"at (\d+)%", wbs[t][5]).group(1))
+           for t in sorted(w for w in wbs if w.startswith("T12b"))]
+check("budget table security FTEs", budget_fte, wbs_fte)
+
+# Contractor hours quoted in the budget table must match the derivation above.
+backfill_row = [c for c in md_rows(plan_md) if c and c[0].startswith("Contractor backfill")][0]
+hours = [int(re.search(r"~?([\d,]+) hours", cell).group(1).replace(",", ""))
+         for cell in backfill_row[1:3]]
+check("contractor hours published in the budget table", hours,
+      [int((RTB_PCT_WEEKS + 4 * 40) / 100.0 * 40), int((RTB_PCT_WEEKS + 8 * 40) / 100.0 * 40)])
 
 # ===========================================================================
 section("9. Deliverables - parsed from the documents themselves")
@@ -495,7 +616,7 @@ check("SCOPE.md lists exactly the 38 active report ids",
       sorted(set(re.findall(r"RPT-\d{3}", family_block))),
       sorted(r["report_id"] for r in active))
 
-mbr = text("MBR.md", ROOT)
+mbr = mbr_text
 check("MBR declares RED", "\U0001F534 **RED**" in mbr, True)
 check("MBR carries explicit asks", "decisions we need" in mbr.lower(), True)
 check("MBR names both scenario dates",

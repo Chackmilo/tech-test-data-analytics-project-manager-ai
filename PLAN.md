@@ -118,7 +118,7 @@ SCENARIO B - go-live Mon 4 January 2027   (September and October identical to A)
 | T02 | Curated tables + March bug fix | D. Whitlock | 2026-07-13 | 2026-09-30 | 58 | 58 | T01 | 0d | 70% done. Extended from 25 to 30 Sep to absorb a 3-day fix. **Critical path.** |
 | T06 | Reporting layer, 38 active reports | M. Okonkwo | 2026-08-17 | 2026-09-11 | 13 | 20 | — | +7d | Descope cuts 40d to 13d. At 0.9 FTE needs 14.4 elapsed: adjusted float +5.6d. |
 | T12a | Security & access review, phase 1 | R. Bekele | 2026-09-07 | 2026-09-18 | 8 | 10 | — | +2d | 60% done. |
-| T14 | Studio scorecard: audit, then build | M. Okonkwo | 2026-09-14 | 2026-09-30 | 10 | 13 | T06 | +3d | **First 2 days are an audit, not a build** — six scorecards already exist and all six are dead (`SCOPE.md` §6). Delivers on the FY2027 open. |
+| T14 | Studio scorecard: audit, then build | M. Okonkwo | 2026-09-14 | 2026-09-30 | 10 | 13 | T06 | +3d | **First 2 days are an audit, not a build** — six scorecards already exist and all six are dead (`SCOPE.md` §6). **The 10 days reserve capacity; they are not an estimate** — see the assumption below. |
 | T03a | Historical backfill, part 1 | D. Whitlock | 2026-10-01 | 2026-10-08 | 6 | 6 | T02 | 0d | Last 6 working days before PTO. **Critical path.** |
 | T03b | Historical backfill, part 2 | D. Whitlock | 2026-10-21 | 2026-10-28 | 6 | 6 | T03a | 0d | Resumes the day after PTO ends. 12 effort days total. **Critical path.** |
 | T07 | UAT, 38-report scope | M. Okonkwo / business leads | 2026-10-19 | 2026-11-06 | 10 | 15 | T06; T14 | +5d | Starts after Finance close ends 16 Oct so Finance-area reports get a real reviewer. |
@@ -175,7 +175,9 @@ SCENARIO B - go-live Mon 4 January 2027   (September and October identical to A)
 
 > **Planning assumption.** `resource-allocation.csv` ends at the week of 2 November 2026. Every allocation from 9 November onward is an assumption requiring committee ratification, not an inherited fact.
 
-> **Estimating assumption.** The **3 engineering days** inside T02 for the March defect is an estimate made before root cause is known; no artifact supports it. **Decision trigger: if diagnosis is not complete by 18 September, the fix no longer fits and the date moves.** Reported to the committee, not managed silently. `ASSESSMENT.md` Finding 2 narrows the likely cause to a single ingestion batch, which is what makes 3 days plausible rather than arbitrary.
+> **Estimating assumption.** The **3 engineering days** inside T02 for the March defect is an estimate made before root cause is known; no artifact supports it. **Decision trigger: if diagnosis is not complete by 18 September, the fix no longer fits and the date moves.** Reported to the committee, not managed silently. `ASSESSMENT.md` Finding 1 narrows the likely cause to a single ingestion batch, which is what makes 3 days plausible rather than arbitrary.
+
+> **Estimating assumption — the studio scorecard.** `T14` carries **10 days with no requirements behind them**. Nothing in `artifacts/` sizes this work: the commitment surfaced at the August steering meeting and the programme team had never heard of it (`steering-notes-2026-08.md:15-16`). The 10 days reserve capacity; they do not estimate a build. **Decision trigger: the 2-day audit ends 15 September.** If it finds the scorecard needs data the warehouse does not hold, the 30 September date is withdrawn at that meeting rather than missed in silence. Committing a delivery date before requirements exist is the inherited plan's habit, and this is where we decline to repeat it.
 
 ---
 
@@ -218,7 +220,7 @@ Same seven-step shape, compressed into the year-end shutdown: freeze Mon 28 Dec,
 
 *Vendor caveat:* the settlement feed migrates v2 → v3. Dual ingestion therefore requires either that the legacy loader can consume the v3 schema, or that the vendor maintains the v2 endpoint through the dual-run window. **Confirming which is a precondition of the gate**, and it is the one dependency in this plan that Twin Hearth does not control.
 
-**2. Connection reversion, RTO under 2 hours.** Reporting and BI connect through an abstraction alias (`edw-bi.twinhearth.internal`), never a direct host. Rollback repoints the alias to the on-premise cluster. **RTO 2 hours, RPO under 4 hours** via delta replay. During the Scenario A soak, RTO is minutes: legacy never stopped being authoritative.
+**2. Connection reversion — proposed design, target RTO under 2 hours.** *Nothing in `artifacts/` describes the current connection topology, so this is what we intend to build, to be confirmed with the IT Director before the gate.* Reporting and BI connect through an abstraction alias rather than a direct host, so rollback is a repoint and not a redeploy. **Target RTO 2 hours, target RPO under 4 hours** via delta replay — objectives to be validated in the staging rehearsal that Go criterion 5 mandates, not measured figures. During the Scenario A soak, rollback is near-instant: legacy never stopped being authoritative.
 
 **3. Authority and triggers.** Incident Commander is the IT Director, with CFO concurrence for anything touching financial reporting. Non-negotiable triggers: revenue divergence **above 0.1%** not root-caused within 4 hours; settlement ingestion failure beyond **12 hours** with no hot fix; warehouse outage beyond **4 business hours** at peak. **Rollback is pre-authorised at the gate** so nobody seeks permission at 03:00.
 
@@ -231,7 +233,7 @@ Same seven-step shape, compressed into the year-end shutdown: freeze Mon 28 Dec,
 | Added duration vs 12 Oct | 50 days (7.1 weeks) | 84 days (12 weeks) |
 | Contractor backfill, legacy loader | **~220 hours** (5.5 FTE-weeks) | **~284 hours** (7.1 FTE-weeks) |
 | Additional engineer | ~9 working days for `T13` | none |
-| Security uplift | Bekele 10% → 60% for 8 working days | Bekele 10% → 75% for 7 working days |
+| Security uplift | Bekele 10% → 65% for 8 working days | Bekele 10% → 75% for 7 working days |
 
 Contractor hours are derived from the run-the-business lines of `resource-allocation.csv` (390 percentage-weeks present in the artifact from 7 Sep to 2 Nov) plus assumed 40% weeks to go-live, not estimated freehand.
 

@@ -68,7 +68,7 @@ Facts derived from artifacts are separated from inferences throughout. A finding
 - Whitlock owns, inside that window: `T08 Production cutover` (12 Oct), `T09 Hypercare` (from 13 Oct), `T04 Parallel run` (to 14 Oct), `T13 Vendor migration` (5–16 Oct).
 - `resource-allocation.csv` plans Whitlock at **160%** in the weeks of 5 and 12 October (70% migration + 50% loader support + 40% vendor feed), and above 100% in **8 of 9 planned weeks**.
 
-*Consequence:* the plan requires one person at 160% capacity while on another continent. On 12 October there is nobody to execute the cutover.
+*Consequence:* the plan requires one person at 160% capacity while on approved leave. `team-notes.md:7` records the travel as non-refundable but states no destination, so no assumption is made about reachability. On 12 October there is nobody rostered to execute the cutover.
 
 ---
 

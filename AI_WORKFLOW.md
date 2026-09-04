@@ -14,7 +14,7 @@ An AI coding agent with repository access was paired with **local Python executi
 2. **Never trusting it with arithmetic.** Language models are unreliable at summing columns and counting working days, and — worse — they are *fluent* while being wrong. Every number in this submission is produced by a script, not by generation.
 3. **Executive translation.** Turning ETL constraints into ledger consequences the CFO can act on.
 
-**What the AI was never allowed to do:** state a number that a script had not computed. That rule was broken twice in drafting, and both breaks are documented in §3.
+**What the AI was never allowed to do:** state a number that a script had not computed. That rule was broken repeatedly in drafting — six times, including once by the script itself. All six are documented in §3.
 
 ---
 
@@ -59,13 +59,13 @@ double-allocated. Find the earliest cutover that lands on a clean accounting bou
 artifacts/. Do not trust verify.py - it was written by the author it validates, so audit
 it for tautologies and hardcoded expectations. Find what the submission missed."
 ```
-**Returned:** four material defects and four missed findings, including both halves of the error in §3.5. This prompt was worth more than the previous four combined, and it is the reason the recommended date changed.
+**Returned:** four material defects and four missed findings, including both halves of the error in §3.5. This prompt was worth more than the previous four combined, and it is the reason the recommended date changed. A second run of the same prompt, narrowed to hunt unsupported claims and to attack the harness directly, produced §3.6.
 
 ---
 
 ## 3. Where the AI Was Confidently Wrong
 
-Five failures, all caught by code or by adversarial review. All five share a signature: sound reasoning, correct-looking shape, invented number.
+Six failures, all caught by code or by adversarial review. Five share a signature: sound reasoning, correct-looking shape, invented number. The sixth is worse than that, and it is the one worth reading.
 
 ### 3.1 — "24 of the 42 rebuilt reports are ghosts"
 An early draft asserted that of the 42 reports Okonkwo had rebuilt, 24 were zero-view ghosts.
@@ -115,6 +115,54 @@ The most instructive failure. `PLAN.md` recommended **Monday 30 November 2026** 
 
 **The lesson worth carrying:** the AI's answer was only as good as the constraint list it was given, and the test meant to catch it had been written by the same process that produced the error. Neither is a reason to stop using AI. Both are reasons to have something attack the output that did not write it.
 
+### 3.6 — The test written to prevent §3.5 was empty
+
+After the Black Friday error, the harness was rebuilt and this document was updated to say the
+lesson had been learned. A second external audit then ran three mutations nobody had thought to try.
+
+```text
+MISSED  move the technical cutover ONTO the Black Friday weekend
+MISSED  change the recommended go-live to a mid-month date that splits December
+MISSED  under-staff security in the budget table while the WBS still says 65%
+```
+
+**All three passed silently.** Three separate mechanisms, each invisible on reading:
+
+1. **A guard loop over an empty list.** The peak-trading check ran
+   `re.findall(r"\*\*(\d{4}-\d{2}-\d{2})\*\* \| \*\*(\d{4}-\d{2}-\d{2})\*\*", plan_md)`, which
+   matches **zero lines** in `PLAN.md`. The loop body never executed. The check reported nothing,
+   failed nothing, and looked exactly like a passing test.
+2. **A parser that skipped the rows that mattered.** WBS rows were matched on
+   `^(T\d+[ab]?|GATE)$`. The cutover, soak and ledger-flip rows carry an **em-dash** in the id
+   column, so the four rows carrying the actual cutover dates were invisible to the harness.
+3. **Whole sections never parsed.** Neither the recommended-date header, the scenario table, nor the
+   section 6 budget table was read at all. That last gap was hiding a live defect: the budget table
+   still said Bekele at **60%** while the WBS said **65%**, and 5 effort days over an 8-day window
+   needs 62.5%.
+
+**Why this is the worst of the six.** Section 3.5 above identifies the previous harness's fatal flaw
+as *"assertions that could not fail"* and presents the rebuild as the correction. The rebuilt harness
+contained an assertion that could not fail (`date(2026, 10, 12) < date(2026, 10, 14)` — two
+literals) and a loop that never ran. **And the loop that never ran was the one guarding the exact
+constraint whose absence caused the error in 3.5.** A test was written to prevent a specific mistake,
+that test was empty, and 246 green checks reported otherwise.
+
+The failure did not recur because the lesson was wrong. It recurred because the fix was verified by
+the same process that needed fixing.
+
+**Fixed:** the guard now iterates over rows parsed from the document (2 cutover windows found, both
+tested); milestone rows are parsed regardless of their id column; go-live dates are read from the
+header *and* the scenario table and cross-checked against each other, the calendar and `MBR.md`; the
+budget table is parsed and reconciled against the WBS; the tautology is replaced by a comparison of
+two dates parsed from the status report. Imported calendar facts — the peak window, the 1 January
+holiday — now sit in one clearly labelled `DECLARED OUTSIDE KNOWLEDGE` block, so a reader can see
+exactly which non-artifact facts the plan leans on. The three audit mutations are permanent cases in
+`mutation_test.py`, which now runs **8 of 8 caught**.
+
+**The lesson, restated properly.** A green test suite is a claim, not evidence. The evidence is a
+failing one. If you cannot show the moment your harness said no, you have not tested anything — and
+"I already fixed that class of bug" is precisely the belief that lets it back in.
+
 ---
 
 ## 4. How the CSVs Were Analysed, and How the Output Was Checked
@@ -137,10 +185,17 @@ CAUGHT  alter the March revenue figure in the artifact
 CAUGHT  extend the vendor freeze so T13 now starts inside it
 CAUGHT  rename a scorecard so Finding 12's count drops to 5
 CAUGHT  under-staff T12b below what its effort needs
+CAUGHT  move the technical cutover ONTO the Black Friday weekend
+CAUGHT  change the recommended go-live to a mid-month date that splits December
+CAUGHT  under-staff security in the budget table while the WBS still says 65%
 
-All 5 mutations caught. The harness can fail.
+All 8 mutations caught. The harness can fail.
 ```
 
-The rebuilt harness runs **246 checks across all eight artifacts and all six deliverables**. During its own construction it caught four further defects in documents that had already been reviewed twice: a task window that could not satisfy its own published float, a security task staffed at 60% when its effort needed 62.5%, a task spanning the PTO it was supposed to avoid, and a citation count that had gone stale.
+The last three came from an external audit and **all three passed silently before the fix in
+§3.6**. They are permanent cases now: a mutation suite that omits the attack you have already
+suffered is decoration.
+
+The rebuilt harness runs **276 checks across all eight artifacts and all six deliverables**. During its own construction it caught four further defects in documents that had already been reviewed twice: a task window that could not satisfy its own published float, a security task staffed at 60% when its effort needed 62.5%, a task spanning the PTO it was supposed to avoid, and a citation count that had gone stale.
 
 **The test of everything above is one command.** Run `python verify.py`. If a number in any deliverable is not in its output, that number should not be believed — including by the person who wrote it.

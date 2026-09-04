@@ -117,13 +117,14 @@ Step 2: Service Level Agreement (SLA)
   - Delivery SLA: Available within 5 business days during Hypercare (Phase 2).
   - Interim Access: Self-service semantic query or SQL extract provided within 24 hours.
 
-Step 3: Technical Preservation (COMMITMENT - NOT YET DONE)
-  - Precondition of the descope: all 120 legacy SSRS RDL files, stored procedures and
-    Excel queries are archived to `archive/legacy-reports/` in this repository BEFORE
-    any report is dropped from the rebuild backlog.
+Step 3: Technical Preservation (COMMITTED - NOT YET EXECUTED)
+  - All 120 legacy SSRS RDL files, stored procedures and Excel queries are archived to
+    `archive/legacy-reports/`. That directory does not exist yet; this is a commitment,
+    not a description of the current repository.
   - Owner: M. Okonkwo. Due: 18 September 2026. Verified by: Incoming PM.
-  - The descope does not take effect until that archive exists. No business logic is
-    deleted or lost at any point.
+  - Nothing is deleted at any point. Reports leave the REBUILD BACKLOG, not the estate,
+    so the descope can proceed on approval while the archive is produced in parallel.
+    The archive gates decommission of the legacy portal, not the scope decision.
 ```
 
 ---

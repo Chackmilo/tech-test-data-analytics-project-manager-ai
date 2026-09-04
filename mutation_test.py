@@ -24,6 +24,18 @@ CASES = [
      "rename a scorecard so Finding 12's count drops to 5"),
     ("PLAN.md", "R. Bekele **at 65%**", "R. Bekele **at 15%**",
      "under-staff T12b below what its effort needs"),
+
+    # The three below came from an external adversarial audit. All three passed
+    # silently against the previous harness: the cutover rows carry an em-dash
+    # id and were invisible to the WBS parser, the peak-trading guard looped
+    # over an empty list, and neither the go-live header nor the budget table
+    # was parsed at all. They are permanent cases now.
+    ("PLAN.md", "| 2026-11-20 | 2026-11-22 |", "| 2026-11-27 | 2026-11-29 |",
+     "move the technical cutover ONTO the Black Friday weekend"),
+    ("PLAN.md", "**Tuesday 1 December 2026**", "**Wednesday 9 December 2026**",
+     "change the recommended go-live to a mid-month date that splits December"),
+    ("PLAN.md", "Bekele 10% → 65% for 8 working days", "Bekele 10% → 10% for 8 working days",
+     "under-staff security in the budget table while the WBS still says 65%"),
 ]
 
 failed_to_catch = []

@@ -12,7 +12,7 @@
 
 | | Evidence |
 |---|---|
-| **Revenue data is wrong.** March 2026 overstated by **+49.82% ($59,724.92)** — **100% of the annual variance in one month.** August passed only because the gate tested annual totals. The variance over 2,998 phantom orders is **$19.92 each**: one duplicated batch, not drift. | `reconciliation-2026-08-28.md` |
+| **Revenue data is wrong.** March 2026 overstated by **+49.82% ($59,724.92)** — **100% of the annual variance in one month.** August passed only because the gate tested annual totals. The variance divided by the 2,998 phantom orders averages **$19.92** — a single price point, consistent with one duplicated ingestion batch rather than drift. Root cause is not yet confirmed. | `reconciliation-2026-08-28.md` |
 | **The vendor is closed.** Aggregator change freeze **5–19 October**, no exceptions. The feed migration was scheduled entirely inside it and needs 9 working days. | `vendor-notice.md` |
 | **The engineer is away.** D. Whitlock — sole loader operator, no runbook — on approved, non-refundable PTO **9–20 October**, while planned at **160%** across cutover week. | `team-notes.md`, `resource-allocation.csv` |
 | **Finance is closed.** Controller at **90% on year-end close 5–16 October** — 4 hours a week for Mythril, and must sign off before cutover. | `steering-notes-2026-08.md` |
@@ -36,7 +36,7 @@ Both go live clear of the Thanksgiving–Cyber Monday weekend. In each, the new 
 
 | # | Decision | Owner | If it is not taken |
 |---|---|---|---|
-| **1** | Re-baseline off 12 October and pick the date by funding — or declining — the second engineer. | CFO / IT Director | We cut over during a vendor freeze, with no engineer, on corrupted revenue, on Black Friday. Then we restate. |
+| **1** | Re-baseline off 12 October and pick the date by funding — or declining — the second engineer. | CFO / IT Director | We attempt cutover during a vendor freeze, with no engineer rostered, on revenue we know is wrong, across the peak trading weekend. Restatement becomes a live risk. |
 | **2** | Approve a Day-One scope of **38 reports**, cutting 82, with a 5-day reactivation SLA. | VP Pub Ops | 27 developer-days go into rebuilding reports **56 of which nobody opened all year**. |
 | **3** | Fund the extension and take the legacy loader off Whitlock (~220–284 contractor hours). | CFO / IT Director | Whitlock stays at 160%, the runbook is never written, and one person's absence can still stop the programme. |
 
