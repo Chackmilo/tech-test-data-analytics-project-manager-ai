@@ -5,24 +5,22 @@
 
 ---
 
-I wanted you to hear this from me first, not in the room.
+You should hear this from me, not in the room.
 
 You committed 12 October to the board because it gave you a clean fiscal break. Having gone through the handover files: **12 October cannot hold.**
 
-Three things make it impossible.
+August's reconciliation passed a ±5% gate on annual totals. Underneath it, **March 2026 revenue is overstated by 49.82% — $59,724.92**, the entire annual variance in one month. The aggregator is under a change freeze 5–19 October. Our only legacy-loader engineer is on approved leave 9–20 October, and Finance is 90% committed to year-end close.
 
-The August reconciliation passed a ±5% gate on annual totals. Underneath it, **March 2026 revenue is overstated by 49.82% — $59,724.92**. That single month is 100% of the annual variance. Cutting over in October means publishing those numbers.
+Straight about what is recoverable: FY2027 Q1 is October–December, so any date after 1 October splits the quarter. That is gone. Below it, you have a choice:
 
-The storefront aggregator is under a change freeze **5-19 October**, no exceptions. The settlement feed migration was scheduled inside it and needs nine working days.
+**Fund one more engineer for the vendor migration and we go live Tuesday 1 December.** November closes on legacy, December opens on the new platform, no month split. Seven weeks.
 
-Our only engineer who can run the legacy loader is on approved leave **9-20 October**, while Finance is 90% committed to year-end close.
+**Decline it and we go live Monday 4 January.** Twelve weeks, but it buys back the quarter: Q1 on legacy, Q2 on the new warehouse.
 
-I propose **Monday, 30 November**, cutover weekend 27–29 November.
+I am not proposing 30 November: it is November's last business day, so it splits the month, and it lands on Cyber Monday with the cutover weekend on Black Friday. Under both plans that weekend runs on the new platform while legacy stays the book of record — our busiest days become the proof the migration works.
 
-Let me be straight about what that recovers. FY2027 Q1 is October-December, so any date after 1 October splits the quarter. That is gone. What 30 November protects is the **month**: November closes entirely on legacy, December opens entirely on the new platform, and no accounting period is ever split across two systems. That is what the audit tests.
-
-It costs roughly seven weeks of team burn. It buys you clean historicals and no restatement.
+Seven or twelve weeks of burn buys clean historicals and no restatement.
 
 The board story is not a slipped project. It is that we found a material revenue defect before cutover rather than after.
 
-Could I have fifteen minutes before the committee meets?
+Fifteen minutes before the committee meets?

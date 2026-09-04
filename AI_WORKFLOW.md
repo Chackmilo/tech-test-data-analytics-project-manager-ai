@@ -1,165 +1,146 @@
 # Mythril Programme — AI Workflow & Verification Audit
 
-**Author:** Incoming Data & Analytics Project Manager  
-**Date:** 31 August 2026  
-**Document:** Methodological audit of AI utilization, prompt logs, and validation controls  
+**Author:** Incoming Data & Analytics Project Manager
+**Date:** 31 August 2026
+**Document:** How AI was used, what it got wrong, and how that was caught
 
 ---
 
-## 1. Tooling Architecture & Rationale
+## 1. Tooling and Why
 
-To assess and re-baseline the Mythril programme under a tight time constraint, an **integrated AI pair-programming agent (Google Antigravity with Advanced Reasoning)** was combined with **local Python/pandas script execution** via the CLI.
+An AI coding agent with repository access was paired with **local Python execution over the artifacts**. The division of labour was deliberate:
 
-### Why this combination:
-1. **Multi-Artifact Cross-Referencing:** Project documentation was fragmented across Markdown status notes, meeting minutes, vendor notices, and three tabular CSV files. LLMs excel at synthesizing qualitative sentiment against quantitative records.
-2. **Eliminating LLM Arithmetic Hallucinations:** Large language models are notorious for making calculation errors when summing CSV columns or calculating working-day date math. To prevent this, the AI was strictly directed to write and execute deterministic Python scripts for all tabular aggregations, calendar math, and network dependency calculations.
-3. **Rapid Executive Drafting:** High-level executive synthesis (MBR, CFO memo) requires translating complex data engineering constraints into commercial and governance impacts.
+1. **Cross-referencing eight fragmented artifacts.** Status notes, meeting minutes, a vendor notice and three CSVs that disagree with each other. Synthesising qualitative claims against quantitative records is what a language model is genuinely good at.
+2. **Never trusting it with arithmetic.** Language models are unreliable at summing columns and counting working days, and — worse — they are *fluent* while being wrong. Every number in this submission is produced by a script, not by generation.
+3. **Executive translation.** Turning ETL constraints into ledger consequences the CFO can act on.
+
+**What the AI was never allowed to do:** state a number that a script had not computed. That rule was broken twice in drafting, and both breaks are documented in §3.
 
 ---
 
-## 2. Concrete Prompts & Outputs
+## 2. Prompts and What Came Back
 
-Below are four representative prompts executed during the assessment, showing the model's analytical progression.
-
-### Prompt 1: Forensic Audit of Financial Reconciliation
+### Prompt 1 — Reconciliation forensics
 ```text
-PROMPT:
-"Inspect artifacts/reconciliation-2026-08-28.md and compare the summary table against 
-the detail appendix. Calculate the exact dollar and percentage deltas across quarters and 
-months. Is the 5% tolerance check mathematically sound from an audit perspective?"
+"Inspect artifacts/reconciliation-2026-08-28.md. Compare the summary table against the
+detail appendix. Calculate exact dollar and percentage deltas by quarter and month. Is
+the 5% tolerance check sound from an audit perspective?"
 ```
-* **Output Synthesized:**
-  The AI highlighted that while the annual net revenue variance was +4.05% (`+$59,724.92`), Q1, Q3, January, and February had **0.00% delta**. Exactly 100% of the annual error was concentrated in **March 2026 (+49.82% / +$59,724.92)**. The AI concluded that evaluating pass/fail exclusively on annual aggregates masked a catastrophic monthly defect that would fail any standard financial audit.
+**Returned:** the annual variance was +4.05% (`+$59,724.92`), while Q1, Q3, January and February were all at 0.00% delta and March 2026 was at **+49.82% (+$59,724.92)**. The model correctly identified that the annual figure and the March figure are *the same dollar amount* — one defect, 100% of the error — and that a gate evaluated on annual aggregates would pass data that fails any monthly audit.
 
----
-
-### Prompt 2: Resource Allocation vs. Project Plan Collision Analysis
+### Prompt 2 — Resource and calendar collision mapping
 ```text
-PROMPT:
-"Cross-reference artifacts/project-plan.csv with artifacts/resource-allocation.csv, 
-team-notes.md, and vendor-notice.md. Map out D. Whitlock's weekly allocations, PTO, 
-and assigned tasks during October 2026. What physical conflicts exist?"
+"Cross-reference project-plan.csv, resource-allocation.csv, team-notes.md and
+vendor-notice.md. Map D. Whitlock's weekly allocations, PTO and assigned tasks across
+October 2026. What physical conflicts exist?"
 ```
-* **Output Synthesized:**
-  The AI revealed that Whitlock was allocated at **160% capacity** during the weeks of 5 October and 12 October (70% migration + 50% legacy support + 40% vendor migration). It cross-referenced `team-notes.md` to identify that Whitlock had approved, non-refundable PTO from 9–20 October, meaning Whitlock was assigned to execute `T08 Production Cutover` on 12 October while physically out of the office. It also flagged that `T13 Storefront feed migration` was scheduled directly inside the vendor's change freeze (5–19 October).
+**Returned:** Whitlock planned at **160%** in the weeks of 5 and 12 October (70% + 50% + 40%), holding approved PTO 9–20 October, while owning cutover, hypercare, parallel run and the vendor migration inside that window — and `T13` scheduled entirely inside the vendor's change freeze.
 
----
-
-### Prompt 3: Telemetry & Scope Triage of 120 Reports
+### Prompt 3 — Report telemetry triage
 ```text
-PROMPT:
-"Write and run a Python script over artifacts/report-usage.csv. Group reports into 
-usage tiers (zero views in 12m, viewed in 2026, viewed prior to 2026). Calculate the 
-cumulative percentage of total views captured by reports viewed in 2026. Audit the 
-source column and flag any anomalies in the last_viewed timestamps."
+"Write and run a Python script over report-usage.csv. Tier reports by usage (zero views,
+viewed in 2026, viewed before 2026). Compute the cumulative share of views captured by
+the 2026 tier. Audit the source column and flag anomalies in last_viewed."
 ```
-* **Output Synthesized (via script execution):**
-  - Total reports: 120. Total annual views: 2,309.
-  - Zero views: 56 reports (46.67%).
-  - Viewed in 2026: 38 reports (31.67%), accounting for 2,270 views (**98.31% of total consumption**).
-  - Dormant (viewed before 2026): 26 reports (1.69% of views).
-  - Data anomaly discovered: 19 reports recorded `views_last_12m > 0` but had `last_viewed` dates in 2024 or early 2025, indicating stale/corrupted telemetry counters.
-  - Architecture debt: 10 of the 38 active reports sourced from `Excel extract`, not the EDW.
+**Returned, via script:** 120 reports, 2,309 views. 56 with zero views (46.67%). 38 viewed in 2026 holding 2,270 views (**98.31%**). 26 dormant holding 39. Ten of the 38 sourced from Excel extracts rather than the EDW. And an anomaly nobody was looking for: **19 reports report `views_last_12m > 0` with a `last_viewed` older than 12 months** — the telemetry contradicts itself.
 
----
-
-### Prompt 4: Sequential Critical Path Modeling for 30 November Cutover
+### Prompt 4 — Constraint-driven schedule modelling
 ```text
-PROMPT:
-"Simulate a revised project schedule starting 1 September 2026. Constraints:
-- Whitlock cannot be double-allocated post-PTO; T03 (12d) and T13 (9d) must be sequential.
-- Whitlock PTO is 9–20 October inclusive (8 working days).
-- Vendor freeze is 5–19 October inclusive.
-- Oct 1–8 has 6 working days.
-- Parallel run T04 requires 10 working days; Finance sign-off T05 requires 2 working days.
-Determine the earliest viable cutover date that provides a clean monthly accounting boundary."
+"Model a revised schedule from 1 September 2026. Constraints: Whitlock PTO 9-20 Oct
+inclusive; vendor freeze 5-19 Oct inclusive; vendor needs 9 working days; T03 is 12 days
+and must split around the PTO; T04 needs 10 days; T05 needs 2. Whitlock cannot be
+double-allocated. Find the earliest cutover that lands on a clean accounting boundary."
 ```
-* **Output Synthesized (via script execution):**
-  - T03 Part 1: Oct 1–8 (6 workdays).
-  - T03 Part 2: Oct 21–28 (6 workdays).
-  - T13: Oct 29 – Nov 10 (9 workdays).
-  - T04: Nov 11 – Nov 24 (10 workdays).
-  - T05: Nov 25 – Nov 26 (2 workdays).
-  - Go/No-Go Gate: Friday 27 November. Cutover execution window: 27–29 November.
-  - Production Go-Live: **Monday, 30 November 2026**.
-  - Outcome: Solves the CFO's fiscal ledger requirement by allowing November to close on legacy and December to start 100% on the cloud platform.
+**Returned, via script:** backfill splits 1–8 October (6 working days) and 21–28 October (6), vendor migration follows, then parallel run, sign-off, gate, cutover. It produced Monday 30 November as the earliest "clean boundary" date. **That answer was wrong, and §3.5 explains why the constraint list was the reason.**
 
----
-
-## 3. The "Confidently Wrong" AI Moments (Hallucinations Caught)
-
-During the forensic investigation, code verification caught **four** confidently-wrong AI outputs. All four shared a signature: the reasoning was sound, the *shape* of the answer was right, and the number was invented. Each is documented below with the check that caught it.
-
-### Hallucination 1: The "24 Rebuilt Ghost Reports" Assumption
-* **The AI's Plausible Finding:** In an initial draft, the AI confidently stated: *"In the 42 reports already rebuilt by M. Okonkwo (35%), 24 of them were zero-view ghost reports, proving engineering effort is being actively wasted."*
-* **Why it seemed plausible:** In `report-usage.csv`, if one inspects the first 42 rows numerically (`RPT-001` to `RPT-042`), exactly 24 of those reports have zero views.
-* **How it was caught:** When auditing the proof for `ASSESSMENT.md`, we searched for the artifact evidence confirming build sequence. `report-usage.csv` contains *no build order or completion flag*. The assumption that Okonkwo worked strictly in numerical order was an unsubstantiated inference.
-* **Correction Applied:** Per the assessment rules (*"a finding with no evidence is an opinion"*), the text was surgically corrected to state: *"There is no artifact evidence recording the build sequence. If Okonkwo rebuilt reports without usage prioritization, the statistical expected value is that ~20 of the 42 rebuilt reports are zero-use ghosts. Determining which reports were rebuilt is Question #1 for Okonkwo."*
-
----
-
-### Hallucination 2: Calendar Arithmetic Error (The "8 Working Days in October" Error)
-* **The AI's Plausible Finding:** The AI proposed starting `T03 Historical Backfill` on 1 October and claimed that *"all 8 days prior to Whitlock's PTO (1–8 October) would be completed, leaving only 4 days post-PTO."*
-* **How it was caught:** When running a verification script over the calendar dates, the script counted the business days between Thursday 1 October and Thursday 8 October:
-  `Oct 1 (Thu), Oct 2 (Fri), Oct 5 (Mon), Oct 6 (Tue), Oct 7 (Wed), Oct 8 (Thu)` = **6 working days, not 8**.
-* **Impact of Error:** Overlooking this would have pushed `T03` completion 2 business days later post-PTO, causing an unbudgeted cascade that would have collapsed the revised 23 November date.
-* **Correction Applied:** The schedule was completely recalculated using deterministic Python datetime logic, advancing the cutover recommendation to **Monday, 30 November 2026**, which also solved the CFO's financial ledger problem.
-
----
-
-### Hallucination 3: Grouping into "17 Core Families"
-* **The AI's Plausible Finding:** The AI claimed the 38 active reports condensed into *"17 core report families."*
-* **How it was caught:** Normalizing the report titles and entities programmatically revealed **24 distinct functional families** (or ~19 under aggressive grouping). The number 17 was a rounded LLM estimation without mathematical backing.
-* **Correction Applied:** Replaced with the audited count of 24 base families.
-
----
-
-### Hallucination 4: The Fabricated Total Float Column (the most dangerous one)
-
-* **The AI's Plausible Finding:** The first draft of `PLAN.md` shipped a Total Float column for every task
-  in the revised schedule: `T02 0d`, `T06 +15d`, `T12 +5d`, `T09 +5d`, `T10 +2d`, `T14 +10d`.
-* **Why it seemed plausible:** The numbers were the right order of magnitude, monotonically sensible, and
-  sat in a table that looked audited. Nothing about them read as invented.
-* **How it was caught:** `verify.py` recomputes float for every row as
-  `working days in window - effort days`. Six of fifteen rows disagreed with the draft. Worse, **T02 came
-  back at -2 days**: 13 Jul to 28 Sep is 56 working days and the task carried 58 effort days after the
-  3-day bug fix was added. The head of the critical path was over-committed, and the table said `0d`.
-* **Why this was the most dangerous of the four:** `ASSESSMENT.md` Finding 6 attacks the inherited plan
-  precisely for zero float. Presenting a fabricated float column while making that argument would have
-  handed the Steering Committee the one rebuttal that discredits the whole submission.
-* **Correction Applied:** T02 end date moved from 25 to 30 September (window 58 working days, effort 58,
-  float 0), backfill Part 1 shifted to 1-8 October, every float recomputed by script, and the float method
-  is now stated in the table header so anyone can re-derive it. `T08` no longer carries a float number at
-  all: it is a weekend window of 1 working day plus 2 non-working days, where float is not a meaningful
-  measure.
-* **Process change:** no derived number ships in any deliverable unless `verify.py` computes it. The
-  script is committed alongside the documents for exactly this reason.
-
----
-
-## 4. Methodology for CSV Analysis and Data Integrity Verification
-
-To ensure 100% data integrity, all conclusions drawn from the CSV files adhered to a three-tier verification protocol:
-
+### Prompt 5 — Adversarial review of the finished submission
+```text
+"You are grading this submission against README.md. Re-derive every number yourself from
+artifacts/. Do not trust verify.py - it was written by the author it validates, so audit
+it for tautologies and hardcoded expectations. Find what the submission missed."
 ```
-DATA VERIFICATION PROTOCOL:
+**Returned:** four material defects and four missed findings, including both halves of the error in §3.5. This prompt was worth more than the previous four combined, and it is the reason the recommended date changed.
 
-1. Never Prompt LLMs for Direct Math:
-   - Queries like "What is the total views of reports where platform=Excel?" were NEVER
-     evaluated via generative text.
-   - The AI was instructed to generate an explicit Python script utilizing the pandas library.
+---
 
-2. Deterministic Local Execution:
-   - Scripts were executed in the workspace using the local Python 3 environment.
-   - Outputs were dumped as raw text and inspected.
-   - The consolidated script is committed as `verify.py` at the repository root. Running
-     `python verify.py` regenerates every number quoted in ASSESSMENT.md, PLAN.md, SCOPE.md,
-     MBR.md and CFO_MESSAGE.md, and exits non-zero if any assertion fails.
+## 3. Where the AI Was Confidently Wrong
 
-3. Cross-Check Against Edge Cases:
-   - Date formats were validated using `pd.to_datetime(..., errors='coerce')`.
-   - String matching was verified using regular expressions and exact lowercase stripping.
-   - Resource allocations were summed by person and by week to verify total capacity burdens.
+Five failures, all caught by code or by adversarial review. All five share a signature: sound reasoning, correct-looking shape, invented number.
+
+### 3.1 — "24 of the 42 rebuilt reports are ghosts"
+An early draft asserted that of the 42 reports Okonkwo had rebuilt, 24 were zero-view ghosts.
+
+**Why it was seductive:** it is *almost* true. Of the first 42 rows of `report-usage.csv`, exactly 24 do carry zero views. The number is real.
+
+**How it was caught:** searching for the evidence to cite. `report-usage.csv` contains **no build order and no completion flag**. The claim silently assumed Okonkwo worked in ID order.
+
+**Fixed:** withdrawn and replaced with the defensible statement — expected value ~20 of 42 if the rebuild was not usage-prioritised, and establishing which 42 were built is question one for Okonkwo.
+
+### 3.2 — "8 working days before the PTO"
+The model proposed starting backfill on 1 October and claimed 8 of its 12 days would complete before the PTO.
+
+**How it was caught:** counting them. `Oct 1 (Thu), 2 (Fri), 5 (Mon), 6 (Tue), 7 (Wed), 8 (Thu)` = **6 working days, not 8**.
+
+**Fixed:** all date arithmetic moved to `datetime` and asserted in `verify.py`.
+
+### 3.3 — "17 core report families"
+The model claimed the 38 active reports condensed into 17 families.
+
+**How it was caught:** normalising the titles programmatically produced **24**. The 17 was a plausible-sounding estimate with nothing behind it.
+
+**Fixed:** replaced with the computed 24.
+
+### 3.4 — A fabricated Total Float column
+A draft of `PLAN.md` published float for every task: `T02 0d`, `T06 +15d`, `T12 +5d`, `T09 +5d`, `T10 +2d`, `T14 +10d`.
+
+**How it was caught:** recomputing `window − effort` for every row. **Six of fifteen disagreed**, and `T02` came back at **−2 days** — 58 effort days in a 56-day window. The head of the critical path was over-committed while the table read `0d`.
+
+**Why this one was dangerous:** `ASSESSMENT.md` Finding 6 attacks the inherited plan *precisely* for zero float. Publishing an invented float column while making that argument would have handed the committee the one rebuttal that discredits everything else.
+
+**Fixed:** dates corrected, the method stated in the table header, and `verify.py` now parses the table out of `PLAN.md` rather than holding its own copy.
+
+### 3.5 — The recommended date was wrong twice, and the harness could not see it
+The most instructive failure. `PLAN.md` recommended **Monday 30 November 2026** and told the CFO, in writing, that it meant *"no accounting month is ever split across two systems."*
+
+**Both halves were wrong:**
+
+1. **30 November is the last business day of November,** not the first of December. Going live that morning puts 30 November's transactions on the new platform and the rest of the month's on legacy. It splits the exact month it claimed to protect.
+2. **26–30 November 2026 is Thanksgiving through Cyber Monday** — the highest-volume trading weekend of the year for a publisher settling through five digital storefronts. The plan scheduled a feed freeze and a connection repoint straight through it.
+
+**Why the AI produced it:** it answered the question it was given. Prompt 4 listed the PTO, the freeze, the fiscal close and the task durations. It did not mention the retail calendar, and it did not ask the model to distinguish a month's *last* business day from the next month's *first*. **The model was not hallucinating; it was optimising against an incomplete constraint set.** That is a harder failure mode than invention, because the output is internally consistent and confidently argued.
+
+**Why the harness missed it:** `verify.py` at that point contained a literal `check("FY2027 Q1 contains December 2026", True, True)` — an assertion that cannot fail. It also hardcoded the reconciliation figures without opening the artifact, hardcoded the revised schedule without reading `PLAN.md`, and never read five of the eight artifacts at all. It reported 109 passing checks and manufactured confidence in a wrong date.
+
+**Fixed:** the date became two dates contingent on a funding decision (1 December or 4 January, `PLAN.md` §1), the peak-trading calendar is now both a scheduling constraint and a Go criterion, and the harness was rebuilt from scratch (§4).
+
+**The lesson worth carrying:** the AI's answer was only as good as the constraint list it was given, and the test meant to catch it had been written by the same process that produced the error. Neither is a reason to stop using AI. Both are reasons to have something attack the output that did not write it.
+
+---
+
+## 4. How the CSVs Were Analysed, and How the Output Was Checked
+
+**Rule 1: never ask the model for arithmetic.** Questions like *"how many reports have zero views?"* were never answered by generation. The model wrote a script; the script answered.
+
+**Rule 2: the harness must parse, not restate.** `verify.py` was rebuilt after the audit in §3.5. It now:
+
+- parses the markdown tables in `reconciliation-2026-08-28.md` and recomputes **the artifact's own published percentages**;
+- extracts the freeze window from `vendor-notice.md`, the PTO from `team-notes.md`, the milestone table and budget line from `status-report-2026-08.md`, and the commitments from `steering-notes-2026-08.md` — **all eight artifacts are read**, where the previous version read three;
+- parses the WBS tables out of `PLAN.md` and recomputes every float from the dates published there;
+- opens each citation in `ASSESSMENT.md` and confirms the file and the line range exist;
+- derives constraints rather than asserting them — the peak-trading window is computed from the calendar (fourth Thursday of November), not typed in.
+
+**Rule 3: prove the test can fail.** A passing suite is not evidence unless it fails when the truth changes. `mutation_test.py` corrupts one source of truth at a time and confirms the harness notices:
+
+```text
+CAUGHT  shorten a critical-path task window in PLAN.md by 3 days
+CAUGHT  alter the March revenue figure in the artifact
+CAUGHT  extend the vendor freeze so T13 now starts inside it
+CAUGHT  rename a scorecard so Finding 12's count drops to 5
+CAUGHT  under-staff T12b below what its effort needs
+
+All 5 mutations caught. The harness can fail.
 ```
 
-By enforcing strict code-level verification, every metric in this submission is reproducible rather than asserted. The test of that claim is simple: run `python verify.py`. If a number in any deliverable is not in its output, the number should not be believed — including by the person who wrote it.
+The rebuilt harness runs **246 checks across all eight artifacts and all six deliverables**. During its own construction it caught four further defects in documents that had already been reviewed twice: a task window that could not satisfy its own published float, a security task staffed at 60% when its effort needed 62.5%, a task spanning the PTO it was supposed to avoid, and a citation count that had gone stale.
+
+**The test of everything above is one command.** Run `python verify.py`. If a number in any deliverable is not in its output, that number should not be believed — including by the person who wrote it.

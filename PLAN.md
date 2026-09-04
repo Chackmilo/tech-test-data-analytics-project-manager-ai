@@ -2,212 +2,254 @@
 
 **Author:** Incoming Data & Analytics Project Manager
 **Date:** 31 August 2026
-**Baseline Revision:** v2.0 (Supersedes August 2026 Baseline)
-**Target Cutover Date:** Monday, 30 November 2026 (Execution Window: 27–29 November 2026)
+**Baseline Revision:** v3.0 (supersedes the August 2026 baseline)
+**Recommended cutover:** **Tuesday 1 December 2026** if a second engineer is funded — **Monday 4 January 2027** if not.
 
 ---
 
-## 1. Executive Summary: The Defensible Cutover Date
+## 1. The Date Is a Decision, Not an Estimate
 
-### **Target Production Cutover: Monday, 30 November 2026**
-*(Execution Window: Friday evening 27 November through Sunday 29 November 2026)*
+12 October 2026 is unreachable. Four hard stops sit inside one fortnight: the vendor API freeze (5–19 Oct), the sole engineer's approved PTO (9–20 Oct), Finance year-end close (5–16 Oct), and an undiagnosed +49.82% revenue defect in March 2026.
 
-The inherited date of **12 October 2026** is unviable due to the convergence of an unnegotiable vendor API freeze (5–19 Oct), the sole engineer's approved PTO (9–20 Oct), Finance fiscal year-end close (5–16 Oct), and an uninvestigated +49.82% revenue defect in March 2026.
+Rather than hand the Steering Committee one date and ask them to accept it, this plan presents **two fully-costed baselines that differ by exactly one decision: whether to fund a second engineer for the vendor migration.**
 
-### Why 30 November 2026 Wins the Financial & Operational Argument
-
-1. **It answers the CFO's actual reason for 12 October.** The CFO chose 12 October because it was a clean break for the new fiscal year (`steering-notes-2026-08.md:7-8`). Be precise about what is and is not recoverable: FY2027 Q1 runs **October–December 2026**, so *any* date after 1 October splits that quarter across two systems. What is still recoverable is the **month** boundary. A 30 November go-live means November closes entirely on legacy and December opens entirely on the new warehouse — **no accounting month is ever split between two systems**, which is the property an auditor actually tests. A mid-month date (e.g. 23 November) forfeits that.
-2. **Honours all physical constraints sequentially.** Whitlock is never double-allocated. Backfill completes first; vendor migration follows; parallel run runs on clean data with a live settlement feed.
-3. **Respects Finance availability.** Sign-off lands 25–26 November, after the October close.
-4. **Carries real float.** Every non-critical task carries declared float, and there is a formal decision gate one working day before the cutover window.
-
-### Why Not Faster — The Option We Priced and Rejected
-
-`T13` sits on the critical path **only because Whitlock is a single resource**, not because of logical precedence. If a second engineer (or a vendor-led migration) ran `T13` from 21 October in parallel with `T03` Part 2, the chain compresses:
-
-| | Sequential (recommended) | With a second engineer |
+| | **Scenario A** | **Scenario B** |
 |---|---|---|
-| T13 Vendor migration | 29 Oct – 10 Nov | 21 Oct – 2 Nov |
-| T04 Parallel run | 11–24 Nov | 3–16 Nov |
-| T05 Finance sign-off | 25–26 Nov | 17–18 Nov |
-| **Go-live** | **Mon 30 Nov** | Mon 23 Nov |
+| **Business go-live** | **Tue 1 December 2026** | **Mon 4 January 2027** |
+| Slip from 12 October | 50 days (7.1 weeks) | 84 days (12 weeks) |
+| Requires | **One additional engineer** (or vendor-led migration) for `T13`, ~9 working days | No new headcount |
+| Technical cutover window | Fri 20 – Sun 22 Nov, then an 8-day soak with legacy authoritative | Mon 28 – Thu 31 Dec, inside the year-end shutdown |
+| Ledger boundary | Month: November closes on legacy, December opens on the new platform | **Quarter: FY2027 Q1 entirely on legacy, FY2027 Q2 entirely on the new platform** |
+| Peak-season validation | The Black Friday weekend runs on the new platform in soak, legacy still the book of record | The Black Friday weekend runs inside an extended 18-day parallel run |
+| Contractor backfill | ~220 hours | ~284 hours |
 
-The option buys exactly **one week (5 working days)** and costs a second engineer who does not exist anywhere in `resource-allocation.csv`. It also lands go-live **mid-month**, forfeiting the clean ledger boundary that is the main reason the new date is defensible at all. **We do not recommend buying it.** It is documented here so the Steering Committee knows it was evaluated, not overlooked.
+**Both are defensible. Neither splits an accounting period. Neither puts a cutover on top of the year's biggest sales weekend.** The Steering Committee chooses by deciding whether to fund the engineer.
+
+### Why the fiscal argument had to change
+
+The CFO chose 12 October because it was a clean break for the new fiscal year (`steering-notes-2026-08.md:7-8`). Be exact about what survives:
+
+FY2026 Q1 was Oct–Dec 2025 (`reconciliation-2026-08-28.md:24`), so **FY2027 Q1 is October–December 2026**. Any date after 1 October splits that quarter. The quarter is already gone.
+
+What remains recoverable is the boundary below it. **Scenario A guarantees no accounting *month* is split.** Scenario B goes further and recovers the quarter itself — FY2027 Q1 closes wholly on legacy, FY2027 Q2 opens wholly on the new warehouse. That is a cleaner break than 12 October would ever have produced, because 12 October was itself eleven days into Q1.
+
+### Why not 30 November
+
+An earlier draft of this plan recommended Monday 30 November. It was wrong twice, and both errors are worth stating because they are the two questions the committee will ask:
+
+1. **30 November is the last business day of November,** not the first of December. Going live that morning puts 30 November's orders on the new platform and 1–27 November's on legacy. That splits November — the exact failure the date was chosen to avoid.
+2. **26–30 November 2026 is Thanksgiving through Cyber Monday.** For a publisher settling through five digital storefronts, that is the highest-volume revenue weekend of the year. Freezing feeds and repointing connections across it is not a scheduling inconvenience; it is a commercial outage at peak.
+
+Both scenarios below turn that weekend from a hazard into an asset: the new platform processes the peak under observation while legacy remains the system of record. **No synthetic test data we could construct is worth as much as a verified Black Friday.**
 
 ---
 
-## 2. The Real Critical Path & Network Logic
-
-### True Critical Path Sequence
+## 2. Critical Path
 
 ```
-T02 (Curated tables + March bug fix)
-  -> T03 Part 1 (Backfill, pre-PTO)
+T02 (curated tables + March bug fix)
+  -> T03 Part 1 (backfill, pre-PTO)
   -> [PTO + vendor freeze + FY close: planned pause]
-  -> T03 Part 2 (Backfill, post-PTO)
-  -> T13 (Vendor settlement feed migration)
-  -> T04 (Parallel run)
+  -> T03 Part 2 (backfill, post-PTO)
+  -> T13 (vendor settlement feed)   A: parallel, 2nd engineer | B: sequential on Whitlock
+  -> T04 (parallel run)
   -> T05 (Finance sign-off)
-  -> GATE (Go/No-Go)
-  -> T08 (Cutover)
+  -> GATE -> cutover -> go-live
 ```
 
-The critical path is governed by ETL engineering, vendor onboarding and financial validation. **Descoping the reporting catalogue does not shorten it** — reporting runs in parallel and carries float. Descoping is still essential: it de-risks UAT and it is the only source of capacity for the unbudgeted FY2027 Studio Scorecard (see `SCOPE.md`).
+`T13` is on the critical path **only because Whitlock is a single resource**, not because of logical precedence. That is the entire difference between the two scenarios, and it is why the date is a funding decision.
+
+**Descoping the report catalogue does not shorten this path** — reporting runs in parallel with float. Descoping still matters: it de-risks UAT and is the only source of capacity for the Studio Relations commitment (see `SCOPE.md`).
 
 ```
-CHRONOLOGICAL TIMELINE (SEPTEMBER 2026 - JANUARY 2027):
+SCENARIO A - go-live Tue 1 December 2026
 
-[Sep 1  - Sep 30] ===== T02 Curated Tables + March Bug Fix (Whitlock) =====
-[Sep 1  - Sep 18] ----- RTB Runbook + Knowledge Transfer (Whitlock 20% / IT Ops) -----
-[Aug 17 - Sep 11] ..... T06 Day-One Reports, 38 active (Okonkwo) .....
-[Sep 14 - Sep 30] ..... T14 NEW: FY2027 Studio Scorecard (Okonkwo) .....
-[Oct 1  - Oct 8 ] ===== T03 Historical Backfill Part 1 (6 of 12 workdays) =====
+[Sep 1  - Sep 30] ===== T02 Curated tables + March bug fix (Whitlock) =====
+[Sep 1  - Sep 18] ----- Legacy loader runbook + knowledge transfer (Whitlock 20% / IT Ops) -----
+[Aug 17 - Sep 11] ..... T06 Day-One reports, 38 active (Okonkwo) .....
+[Sep 14 - Sep 30] ..... T14 Studio scorecard: audit then build (Okonkwo) .....
+[Oct 1  - Oct 8 ] ===== T03 Backfill Part 1 (6 of 12 workdays) =====
+[Oct 5  - Oct 19] XXXXX VENDOR API FREEZE XXXXX
+[Oct 5  - Oct 16] ##### FINANCE YEAR-END CLOSE #####
+[Oct 9  - Oct 20] ***** WHITLOCK PTO (8 working days) *****
+[Oct 19 - Nov 6 ] ..... T07 UAT (post-close, so Finance can attend) .....
+[Oct 21 - Oct 28] ===== T03 Backfill Part 2 (Whitlock) =====
+[Oct 21 - Nov 2 ] ===== T13 Vendor feed migration (SECOND ENGINEER, in parallel) =====
+[Nov 3  - Nov 16] ===== T04 Parallel run =====
+[Nov 9  - Nov 24] ..... T10 Training & comms (Incoming PM) .....
+[Nov 9  - Nov 18] ..... T12b Cutover security & RBAC (Bekele) .....
+[Nov 17 - Nov 18] ===== T05 Finance sign-off =====
+[Nov 19         ] ||||| GO/NO-GO GATE |||||
+[Nov 20 - Nov 22] >>>>> TECHNICAL CUTOVER (Fri eve - Sun) >>>>>
+[Nov 23 - Nov 30] ~~~~~ SOAK: new platform live, LEGACY IS BOOK OF RECORD ~~~~~
+                        (Thanksgiving 26th, Black Friday 27th, Cyber Monday 30th)
+[Dec 1          ] ***** LEDGER FLIP - BUSINESS GO-LIVE *****
+[Dec 1  - Dec 18] ..... T09 Hypercare .....
+[Jan 11 - Jan 22] ..... T11 Legacy decommission (after 30-day dual run) .....
 
-[Oct 5  - Oct 19] XXXXX VENDOR API CHANGE FREEZE (no credentials / no migrations) XXXXX
-[Oct 5  - Oct 16] ##### FINANCE FISCAL YEAR-END CLOSE (Reyes 90% unavailable) #####
-[Oct 9  - Oct 20] ***** D. WHITLOCK APPROVED PTO (8 working days) *****
 
-[Oct 19 - Nov 6 ] ..... T07 User Acceptance Testing (post-FY-close) .....
-[Oct 21 - Oct 28] ===== T03 Historical Backfill Part 2 (remaining 6 workdays) =====
-[Oct 29 - Nov 10] ===== T13 Storefront Feed Migration (vendor: 9 workdays) =====
-[Nov 9  - Nov 25] ..... T10 Training & Organisational Comms (Incoming PM) .....
-[Nov 11 - Nov 24] ===== T04 Parallel Run (legacy vs new: 10 workdays) =====
-[Nov 16 - Nov 26] ..... T12b Cutover Security & RBAC Review (Bekele) .....
-[Nov 25 - Nov 26] ===== T05 Finance Reconciliation Sign-Off (Reyes: 2 workdays) =====
-[Nov 27         ] ||||| EXECUTIVE GO/NO-GO DECISION GATE (14:00) |||||
-[Nov 27 - Nov 29] >>>>> T08 Production Cutover Execution (weekend window) >>>>>
-[Nov 30         ] ***** PRODUCTION GO-LIVE (clean start for the December ledger) *****
-[Nov 30 - Dec 18] ..... T09 Hypercare & Stabilisation (14 workdays) .....
-[Jan 11 - Jan 22] ..... T11 Legacy Decommission (rollback window preserved) .....
+SCENARIO B - go-live Mon 4 January 2027   (September and October identical to A)
+
+[Oct 29 - Nov 10] ===== T13 Vendor feed migration (Whitlock, sequential) =====
+[Nov 11 - Dec 4 ] ===== T04 Parallel run, EXTENDED to 18 workdays =====
+                        (covers Thanksgiving/Black Friday as shadow validation)
+[Nov 9  - Dec 11] ..... T10 Training & comms .....
+[Nov 30 - Dec 8 ] ..... T12b Cutover security & RBAC .....
+[Dec 7  - Dec 8 ] ===== T05 Finance sign-off =====
+[Dec 11         ] ||||| GO/NO-GO GATE |||||
+[Dec 28 - Dec 31] >>>>> CUTOVER inside the year-end shutdown (4 workdays) >>>>>
+[Jan 1          ] ----- public holiday: buffer before go-live -----
+[Jan 4          ] ***** GO-LIVE - FY2027 Q2 opens on the new platform *****
+[Jan 4  - Jan 22] ..... T09 Hypercare (lowest-volume month) .....
+[Feb 8  - Feb 19] ..... T11 Legacy decommission .....
 ```
 
 ---
 
-## 3. Revised Task Schedule & Work Breakdown Structure
+## 3. Work Breakdown Structure
 
-**Float method:** `Total Float = working days in the planned window − effort days`, computed identically for every row (the same method used to expose the inherited plan's zero-float problem in `ASSESSMENT.md`, Finding 6). Where a resource is allocated below 1.0 FTE, the FTE-adjusted float is given in the notes. All figures are reproducible via `verify.py`.
+**Float method:** `Total Float = working days in window − effort days`, computed identically for every row — the same method used against the inherited plan in `ASSESSMENT.md` Finding 6. Where a resource sits below 1.0 FTE the adjusted figure is in the notes. Every row is recomputed by `verify.py`, which parses this table directly: if a date here is wrong, the harness fails.
 
-| Task ID | Task Name | Owner | Start | End | Effort (d) | Window (wd) | Depends On | Total Float | Notes |
+### Common to both scenarios (September – 28 October)
+
+| ID | Task | Owner | Start | End | Effort | Window | Depends | Float | Notes |
 |---|---|---|---|---|---|---|---|---|---|
-| **T01** | Source system inventory & profiling | D. Whitlock | 2026-06-01 | 2026-07-10 | 28 | 30 | — | **+2d** | Complete (100%). |
-| **T02** | Curated tables + March recon bug fix | D. Whitlock | 2026-07-13 | 2026-09-30 | 58 | 58 | T01 | **0d** | In progress (70%). End date extended from 25 to 30 Sep to absorb the 3-day bug fix. **Critical path.** |
-| **T06** | Rebuild reporting layer (38 active reports) | M. Okonkwo | 2026-08-17 | 2026-09-11 | 13 | 20 | — | **+7d** | Descope cuts effort from 40d to 13d. At 0.9 FTE: 14.4 elapsed days needed, so **FTE-adjusted float +5.6d**. |
-| **T12a** | Security & access review (Phase 1) | R. Bekele | 2026-09-07 | 2026-09-18 | 8 | 10 | — | **+2d** | On track (60%). |
-| **T14** | *NEW:* FY2027 Studio Scorecard build | M. Okonkwo | 2026-09-14 | 2026-09-30 | 10 | 13 | T06 | **+3d** | At 0.9 FTE: 11.1 elapsed days needed, so **FTE-adjusted float +1.9d**. Delivers **on** the promised FY2027 start date. |
-| **T03** | Historical backfill & load validation | D. Whitlock | 2026-10-01 | 2026-10-28 | 12 | 12 | T02 | **0d** | **Split around PTO:** Part 1 = 1–8 Oct (6 wd), Part 2 = 21–28 Oct (6 wd). **Critical path.** |
-| **T07** | User acceptance testing (38-report scope) | M. Okonkwo / Business leads | 2026-10-19 | 2026-11-06 | 10 | 15 | T06; T14 | **+5d** | Deliberately scheduled **after** the 16 Oct end of Finance FY close so Finance-area reports get a real reviewer. |
-| **T13** | Storefront settlement feed migration | D. Whitlock / Vendor | 2026-10-29 | 2026-11-10 | 9 | 9 | T03 *(resource-sequential on Whitlock)*; vendor freeze ends 19 Oct | **0d** | Vendor requires 9 working days from credential issue. **Critical path.** |
-| **T04** | Parallel run: legacy vs new warehouse | D. Whitlock | 2026-11-11 | 2026-11-24 | 10 | 10 | T03; T13 | **0d** | Two full business weeks with a live v3 settlement feed. **Critical path.** |
-| **T10** | Training & organisational comms | Incoming PM | 2026-11-09 | 2026-11-25 | 10 | 13 | T07 | **+3d** | Reassigned from S. Alvear (departs 30 Sep). |
-| **T12b** | Cutover security & RBAC review | R. Bekele | 2026-11-16 | 2026-11-26 | 5 | 9 | T04 | **+4d** | **New.** Closes the security gap: the inherited plan had 0% security allocation from 12 Oct onward. |
-| **T05** | Reconciliation sign-off (Finance) | J. Reyes | 2026-11-25 | 2026-11-26 | 2 | 2 | T04 | **0d** | Post-close availability. Requires 0.00% delta on audited core. **Critical path.** |
-| **GATE** | **Executive Go/No-Go decision gate** | **Steering Committee** | **2026-11-27** | **2026-11-27** | **1** | **1** | **T05; T07; T12b** | **0d** | Formal sign-off: CFO, IT Director, VP Publishing Operations, Incoming PM. |
-| **T08** | Production cutover execution | D. Whitlock / Team | 2026-11-27 | 2026-11-29 | — | — | GATE | *n/a* | **Weekend window: 1 working day (Fri) plus 2 non-working days.** Float is not meaningful here; the buffer sits in the GATE that same afternoon. |
-| **T09** | Hypercare & stabilisation | D. Whitlock / Team | 2026-11-30 | 2026-12-18 | 14 | 15 | T08 | **+1d** | Intensive dual-run monitoring and triage. |
-| **T11** | Legacy warehouse decommission | D. Whitlock | 2027-01-11 | 2027-01-22 | 10 | 10 | T09 | **0d in-window** | Deferred to January 2027 to preserve the rollback window. No downstream constraint, so in-window float of 0 carries no risk. |
+| T01 | Source system inventory | D. Whitlock | 2026-06-01 | 2026-07-10 | 28 | 30 | — | +2d | Complete. |
+| T02 | Curated tables + March bug fix | D. Whitlock | 2026-07-13 | 2026-09-30 | 58 | 58 | T01 | 0d | 70% done. Extended from 25 to 30 Sep to absorb a 3-day fix. **Critical path.** |
+| T06 | Reporting layer, 38 active reports | M. Okonkwo | 2026-08-17 | 2026-09-11 | 13 | 20 | — | +7d | Descope cuts 40d to 13d. At 0.9 FTE needs 14.4 elapsed: adjusted float +5.6d. |
+| T12a | Security & access review, phase 1 | R. Bekele | 2026-09-07 | 2026-09-18 | 8 | 10 | — | +2d | 60% done. |
+| T14 | Studio scorecard: audit, then build | M. Okonkwo | 2026-09-14 | 2026-09-30 | 10 | 13 | T06 | +3d | **First 2 days are an audit, not a build** — six scorecards already exist and all six are dead (`SCOPE.md` §6). Delivers on the FY2027 open. |
+| T03a | Historical backfill, part 1 | D. Whitlock | 2026-10-01 | 2026-10-08 | 6 | 6 | T02 | 0d | Last 6 working days before PTO. **Critical path.** |
+| T03b | Historical backfill, part 2 | D. Whitlock | 2026-10-21 | 2026-10-28 | 6 | 6 | T03a | 0d | Resumes the day after PTO ends. 12 effort days total. **Critical path.** |
+| T07 | UAT, 38-report scope | M. Okonkwo / business leads | 2026-10-19 | 2026-11-06 | 10 | 15 | T06; T14 | +5d | Starts after Finance close ends 16 Oct so Finance-area reports get a real reviewer. |
+
+### Scenario A — second engineer funded, go-live 1 December
+
+| ID | Task | Owner | Start | End | Effort | Window | Depends | Float | Notes |
+|---|---|---|---|---|---|---|---|---|---|
+| T13 | Vendor settlement feed migration | **2nd engineer** / Vendor | 2026-10-21 | 2026-11-02 | 9 | 9 | freeze ends 19 Oct | 0d | Runs **parallel** to T03 Part 2. This is what the funding buys. **Critical path.** |
+| T04 | Parallel run | D. Whitlock | 2026-11-03 | 2026-11-16 | 10 | 10 | T03; T13 | 0d | **Critical path.** |
+| T10 | Training & comms | Incoming PM | 2026-11-09 | 2026-11-24 | 10 | 12 | T07 | +2d | Reassigned from S. Alvear. |
+| T12b | Cutover security & RBAC | R. Bekele **at 65%** | 2026-11-09 | 2026-11-18 | 5 | 8 | T04 | +3d | 5d over an 8-day window needs 62.5% FTE; 65% delivers 5.2d. Closes the 0%-security gap. |
+| T05 | Finance sign-off | J. Reyes | 2026-11-17 | 2026-11-18 | 2 | 2 | T04 | 0d | **Critical path.** |
+| GATE | Go/No-Go | Steering Committee | 2026-11-19 | 2026-11-19 | 1 | 1 | T05; T07; T12b | 0d | Thursday, one day before the window. |
+| — | Technical cutover | Whitlock / IT Ops | 2026-11-20 | 2026-11-22 | — | — | GATE | n/a | Weekend window: 1 working day plus 2 non-working. |
+| — | **Soak, legacy authoritative** | All | 2026-11-23 | 2026-11-30 | — | — | cutover | n/a | New platform processes the peak; legacy remains the book of record. Rollback is a config flip, not a restore. |
+| — | **Ledger flip / go-live** | CFO | 2026-12-01 | 2026-12-01 | — | — | soak | n/a | November closed on legacy. December opens on the new platform. |
+| T09 | Hypercare | Whitlock / team | 2026-12-01 | 2026-12-18 | 14 | 14 | go-live | 0d | |
+| T11 | Legacy decommission | D. Whitlock | 2027-01-11 | 2027-01-22 | 10 | 10 | T09 | 0d | After the 30-day dual run. |
+
+### Scenario B — no new headcount, go-live 4 January
+
+| ID | Task | Owner | Start | End | Effort | Window | Depends | Float | Notes |
+|---|---|---|---|---|---|---|---|---|---|
+| T13 | Vendor settlement feed migration | D. Whitlock / Vendor | 2026-10-29 | 2026-11-10 | 9 | 9 | T03 *(resource-sequential)* | 0d | **Critical path.** |
+| T04 | Parallel run, extended | D. Whitlock | 2026-11-11 | 2026-12-04 | 18 | 18 | T03; T13 | 0d | 18 days rather than 10: the slack buys shadow validation across the peak weekend. **Critical path.** |
+| T10 | Training & comms | Incoming PM | 2026-11-09 | 2026-12-11 | 10 | 25 | T07 | +15d | |
+| T12b | Cutover security & RBAC | R. Bekele **at 75%** | 2026-11-30 | 2026-12-08 | 5 | 7 | T04 | +2d | 75% over 7 wd delivers 5.25d against 5d effort. |
+| T05 | Finance sign-off | J. Reyes | 2026-12-07 | 2026-12-08 | 2 | 2 | T04 | 0d | **Critical path.** |
+| GATE | Go/No-Go | Steering Committee | 2026-12-11 | 2026-12-11 | 1 | 1 | T05; T07; T12b | 0d | Two weeks before the window, so a No leaves room to act. |
+| — | Cutover, year-end shutdown | Whitlock / IT Ops | 2026-12-28 | 2026-12-31 | — | 4 | GATE | n/a | Four working days at the lowest transaction volume of the year. |
+| T09 | Hypercare | Whitlock / team | 2027-01-04 | 2027-01-22 | 14 | 15 | go-live | +1d | |
+| T11 | Legacy decommission | D. Whitlock | 2027-02-08 | 2027-02-19 | 10 | 10 | T09 | 0d | After the 30-day dual run. |
 
 ---
 
-## 4. Required Staffing & Operating Model Changes
+## 4. Staffing Changes Required
 
-For this date to hold, the Steering Committee must approve the following:
+**1. D. Whitlock — break the single point of failure.** Planned at 120–160% across conflicting workstreams, peaking at 160% in the weeks of 5 and 12 October. Offload **100% of run-the-business legacy loader support** to IT Ops or a contractor.
 
-**1. D. Whitlock (Analytics Engineer) — break the single point of failure.**
-- Current state: **120%–160%** planned allocation across conflicting workstreams (peak 160% in the weeks of 5 and 12 October).
-- Mandated change: offload **100% of Run-The-Business legacy loader support** to IT Ops or a contractor.
-- **Honest September split:** Whitlock is **not** available at 100% for T02 while also transferring the loader. Through **18 September** Whitlock runs **80% on T02 / 20% on knowledge transfer** (roughly 3 days total: recorded walkthrough sessions plus review of the runbook, which the receiving IT Ops engineer or contractor writes). From **21 September**, Whitlock is **100% on T02**.
-- **The arithmetic:** T02 remaining = 30% × 58 = **17.4 effort days**. Available September capacity = (14 wd × 0.8) + (8 wd × 1.0) = **19.2 effective days**. Margin: **+1.8 days.** Thin — which is precisely why the RTB offload is a Steering Committee decision and not a preference.
+*Honest September split:* Whitlock cannot be at 100% on T02 while also transferring the loader. Through 18 September: **80% T02 / 20% knowledge transfer** (about 3 days — recorded walkthroughs plus review of a runbook the receiving engineer writes). From 21 September: 100% T02.
 
-**2. M. Okonkwo (BI Developer) — descope and redeploy.**
-- Current state: 90% allocation attempting 120 reports (40 effort days, which is 44.4 elapsed days at 0.9 FTE, slipping past 9 October on its own).
-- Mandated change: descope to the **38 active reports (13 effort days)**, freeing **27 effort days**.
-- Freed capacity reallocated to: (a) the **FY2027 Studio Scorecard**, 10 days, delivering 30 September; (b) source remediation for the **10 active reports currently fed by Excel extracts**, 5 days during hypercare.
+*The arithmetic:* T02 remaining = 30% × 58 = **17.4 effort days**. September capacity = (14 wd × 0.8) + (8 wd × 1.0) = **19.2 days**. Margin **+1.8 days** — thin, which is why the offload is a committee decision and not a preference.
 
-**3. J. Reyes (Finance Controller) — protect, don't negotiate.**
-- Zero programme demands during FY close (5–16 October). UAT for Finance-area reports starts 19 October. Formal sign-off 25–26 November.
+**2. M. Okonkwo — descope and redeploy.** At 90% attempting 120 reports (40 effort days = 44.4 elapsed at 0.9 FTE, which slips past 9 October unaided). Descope to the **38 active reports, 13 effort days**, freeing **27 effort days**: 10 to the studio scorecard (`T14`, audit first), 5 to source remediation for the 10 active reports fed by Excel extracts, the balance to UAT support.
 
-**4. R. Bekele (IT Security) — extend past cutover.**
-- The inherited allocation drops to **0% from the week of 12 October**. Extend at 10% through November for `T12b` (RBAC, credential rotation, cutover access).
+**3. J. Reyes — protect, don't negotiate.** Zero programme demands during close (5–16 Oct). UAT from 19 October, sign-off after the close in both scenarios.
 
-**5. Incoming PM — take ownership now.**
-- S. Alvear departs 30 September while allocated 60% across five subsequent weeks. The incoming PM assumes `T10`, governance and SteerCo reporting from 1 October.
+**4. R. Bekele — fund the level, not just the extension.** The inherited plan drops security to **0% from the week of 12 October**, through cutover and hypercare. `T12b` needs 5 effort days. Over its 8-day window in Scenario A that is **65% FTE**; over its 7-day window in Scenario B, **75%**. Not the 10% Bekele has been carrying — an extension at 10% would deliver 0.9 days against a 5-day task.
 
-> **Explicit planning assumption.** `resource-allocation.csv` terminates at the week of 2 November 2026. Every allocation from 9 November onward (Whitlock, Okonkwo, Reyes, Bekele, PM) is a **planning assumption requiring Steering Committee staffing and budget ratification**, not an inherited fact.
+**5. Incoming PM.** S. Alvear departs 30 September while allocated 60% across five later weeks. Incoming PM takes `T10`, governance and SteerCo reporting from 1 October.
 
-> **Explicit estimating assumption.** The **3 engineering days** budgeted inside T02 for the March defect is an estimate made **before root cause is known**. No artifact supports it. Decision trigger: **if diagnosis is not complete by 18 September**, the fix no longer fits inside T02's window and the cutover date moves. That trigger is reported to the Steering Committee, not managed silently.
+**6. Scenario A only — the second engineer.** One engineer (or a vendor-led migration) for `T13`, roughly 9 working days from 21 October. No such person exists anywhere in `resource-allocation.csv`. This is the single line item that separates 1 December from 4 January.
+
+> **Planning assumption.** `resource-allocation.csv` ends at the week of 2 November 2026. Every allocation from 9 November onward is an assumption requiring committee ratification, not an inherited fact.
+
+> **Estimating assumption.** The **3 engineering days** inside T02 for the March defect is an estimate made before root cause is known; no artifact supports it. **Decision trigger: if diagnosis is not complete by 18 September, the fix no longer fits and the date moves.** Reported to the committee, not managed silently. `ASSESSMENT.md` Finding 2 narrows the likely cause to a single ingestion batch, which is what makes 3 days plausible rather than arbitrary.
 
 ---
 
-## 5. Cutover Execution Plan
+## 5. Cutover Execution
 
-### A. Cutover Sequence (Weekend Window: 27–29 November 2026)
+### Sequence — Scenario A (20–22 November, then soak)
 
-| Phase | Time Window | Actions & Milestones | Responsible Lead |
+| Phase | When | Actions | Lead |
 |---|---|---|---|
-| **1: Pre-cutover freeze** | Fri 27 Nov, 17:00 | Code freeze on the new platform. Final delta load on legacy EDW. Freeze reporting changes. | D. Whitlock |
-| **2: Final ingestion & recon** | Fri 27 Nov 20:00 – Sat 28 Nov 04:00 | Final batch sync from the storefront aggregator (v3) and game platforms. Run automated reconciliation. | D. Whitlock / Vendor |
-| **3: Verification gate** | Sat 28 Nov, 08:00–12:00 | Audit row counts, order totals and revenue across all 5 storefronts and 5 titles. **March 2026 verified at 0.00%.** | J. Reyes / Incoming PM |
-| **4: Traffic cutover** | Sat 28 Nov, 14:00–18:00 | Repoint the BI alias to the cloud warehouse. Deploy the reporting portal against new endpoints. | IT Ops / D. Whitlock |
-| **5: Smoke testing** | Sun 29 Nov, 09:00–15:00 | Synthetic queries; smoke-test all 38 Day-One reports; verify role permissions. | M. Okonkwo / R. Bekele |
-| **6: Go-live broadcast** | Sun 29 Nov, 17:00 | Go-live confirmation to executive stakeholders. Open for Monday operations. | Incoming PM |
+| 1 Freeze | Fri 20 Nov 17:00 | Code freeze. Final delta load on legacy. Freeze reporting changes. | D. Whitlock |
+| 2 Ingest & reconcile | Fri 20 Nov 20:00 – Sat 21 Nov 04:00 | Final sync from aggregator (v3) and platforms. Automated reconciliation. | Whitlock / Vendor |
+| 3 Verification gate | Sat 21 Nov 08:00–12:00 | Row counts, order totals, revenue across 5 storefronts and 5 titles. **March 2026 verified at 0.00%.** | J. Reyes / PM |
+| 4 Traffic cutover | Sat 21 Nov 14:00–18:00 | Repoint the BI alias to the cloud warehouse. Deploy the portal against new endpoints. | IT Ops / Whitlock |
+| 5 Smoke tests | Sun 22 Nov 09:00–15:00 | Synthetic queries; all 38 Day-One reports; role permissions. | Okonkwo / Bekele |
+| 6 **Soak** | Mon 23 – Mon 30 Nov | New platform serves reporting and processes the peak. **Legacy remains the book of record.** Daily delta reconciliation, including a full Black Friday comparison. | Whitlock / Reyes |
+| 7 **Ledger flip** | Tue 1 Dec 09:00 | New warehouse becomes the system of record. November's books close on legacy, unsplit. | CFO |
 
-### B. Go/No-Go Decision Framework
+The soak is the point. For eight days, including the peak weekend, a rollback costs a configuration flip rather than a data restore, and Finance can compare a real high-volume period side by side before signing the ledger over.
 
-- **Decision meeting:** Friday 27 November 2026, 14:00 — one working day before the window opens.
-- **Authority:** unanimous consent among **CFO** (financial sign-off), **IT Director** (technical and infrastructure), **VP Publishing Operations** (operational and reporting), **Incoming PM** (execution).
-- **A single No vote stops the cutover.** There is no override. The fallback is the next clean month boundary (Monday 4 January 2027), not "push through the weekend".
+### Sequence — Scenario B (28–31 December)
 
-**Mandatory Go criteria — all five, no partial credit:**
-1. **Financial reconciliation:** delta between legacy and new platform on core financials across FY2026 and FY2027-to-date is **0.00%**, evaluated **monthly, not annually**. March 2026 verified fixed.
-2. **Storefront feed:** the v3 settlement feed has produced **5 consecutive days** of verified, error-free daily ingestion.
-3. **Reporting layer:** 100% of the 38 Day-One reports validated and passing UAT smoke tests.
-4. **Security:** RBAC matrix signed off by R. Bekele (`T12b`); no critical access findings outstanding.
-5. **Rollback:** rollback runbook **tested in staging**, with a timed rehearsal on record.
+Same seven-step shape, compressed into the year-end shutdown: freeze Mon 28 Dec, ingest and reconcile Mon–Tue, verification gate Wed 30 Dec, traffic cutover Wed afternoon, smoke tests Thu 31 Dec, holiday buffer Fri 1 Jan, go-live Mon 4 Jan. The peak weekend was already validated inside the 18-day parallel run, so there is no soak; the quarter boundary does the work the soak does in Scenario A.
 
-### C. Post-Cutover Rollback Architecture
+### Go/No-Go
 
-A cutover without a proven rollback is an unacceptable business risk. If critical defects emerge after the switch, Twin Hearth Studios must be able to restore legacy operations within hours.
+- **Authority:** unanimous consent among **CFO** (financial), **IT Director** (technical), **VP Publishing Operations** (operational), **Incoming PM** (execution).
+- **A single No stops the cutover.** No override. Fallback from Scenario A is Scenario B; fallback from Scenario B is Monday 1 February 2027. There is no "push through the weekend".
 
-**1. Dual-ingestion and parallel sync (retention: 30 days).**
-- The legacy SSIS loader is **not** decommissioned at cutover.
-- For 30 days post-cutover (through 31 December 2026), raw ingestion is dual-written to the new cloud landing zone and to legacy staging (or replayed daily from the bronze layer).
-- `T11 Decommission` is therefore rescheduled to **January 2027**. This is the cost of a real rollback, and it is deliberate.
+**Go criteria — all six, no partial credit:**
+1. Legacy-to-new delta on core financials across FY2026 and FY2027-to-date is **0.00%**, evaluated **monthly, not annually**. March 2026 verified fixed.
+2. The v3 settlement feed has produced **5 consecutive days** of verified error-free ingestion.
+3. All 38 Day-One reports validated and passing UAT smoke tests.
+4. RBAC matrix signed off by R. Bekele (`T12b`); no critical access findings open.
+5. Rollback runbook **tested in staging**, with a timed rehearsal on record.
+6. **Scenario A only:** the soak has completed a full peak-weekend reconciliation at 0.00% before the ledger flips.
 
-**2. Connection reversion (RTO under 2 hours).**
-- Reporting portal and BI services connect through an abstraction alias (`edw-bi.twinhearth.internal`), never a direct host.
-- On rollback, IT Ops repoints the alias to the on-premise legacy cluster.
-- **RTO: 2 hours. RPO: under 4 hours** (delta sync replay).
+### Rollback
 
-**3. Invocation authority and triggers.**
-- **Authority:** Incident Commander (IT Director), with CFO concurrence for any trigger touching financial reporting.
-- **Non-negotiable rollback triggers:**
-  - Revenue divergence **above 0.1%** discovered post-go-live and not root-caused within 4 hours.
-  - Settlement ingestion failure exceeding **12 hours** that cannot be hot-fixed.
-  - Cloud warehouse outage exceeding **4 business hours** during peak operations.
-- **Rollback is a decision, not a failure.** It is pre-authorised at the gate so nobody has to seek permission at 03:00.
+**1. Dual ingestion, 30 days.** The legacy SSIS loader is **not** decommissioned at cutover. Raw ingestion is dual-written to the cloud landing zone and to legacy staging (or replayed daily from the bronze layer) for 30 days after go-live. `T11` is scheduled accordingly — January in A, February in B. This is the cost of a real rollback and it is deliberate.
+
+*Vendor caveat:* the settlement feed migrates v2 → v3. Dual ingestion therefore requires either that the legacy loader can consume the v3 schema, or that the vendor maintains the v2 endpoint through the dual-run window. **Confirming which is a precondition of the gate**, and it is the one dependency in this plan that Twin Hearth does not control.
+
+**2. Connection reversion, RTO under 2 hours.** Reporting and BI connect through an abstraction alias (`edw-bi.twinhearth.internal`), never a direct host. Rollback repoints the alias to the on-premise cluster. **RTO 2 hours, RPO under 4 hours** via delta replay. During the Scenario A soak, RTO is minutes: legacy never stopped being authoritative.
+
+**3. Authority and triggers.** Incident Commander is the IT Director, with CFO concurrence for anything touching financial reporting. Non-negotiable triggers: revenue divergence **above 0.1%** not root-caused within 4 hours; settlement ingestion failure beyond **12 hours** with no hot fix; warehouse outage beyond **4 business hours** at peak. **Rollback is pre-authorised at the gate** so nobody seeks permission at 03:00.
 
 ---
 
-## 6. Budgetary Impact (Team Burn Accounting)
+## 6. Budget Impact
 
-- Moving cutover from 12 October to 30 November adds **7 calendar weeks** (49 days) of programme execution.
-- **Internal labour:** Whitlock, Okonkwo, Bekele and the incoming PM extended across those 7 weeks.
-- **Contractor backfill for the legacy loader**, derived from the `resource-allocation.csv` RTB lines rather than estimated: 40% for the weeks of 7 / 14 / 21 Sep, 50% for 28 Sep and 5 / 12 Oct, 40% for 19 Oct / 26 Oct / 2 Nov, plus an assumed 40% for the four November weeks to go-live = **5.5 FTE-weeks, roughly 220 hours**.
-- The August status report showed **71% budget consumed against 74% elapsed** — measured against a schedule that was never achievable. That green is not evidence of budget health; it is another artefact of a fictional baseline.
-- **Trade-off:** attempting 12 October guarantees cutover failure, financial misstatement and emergency remediation. 220 contractor hours plus 7 weeks of internal burn is the cheaper of the two outcomes by a wide margin.
-
----
-
-## 7. Plan Defensibility Summary
-
-| Challenge | What the 12 Oct plan did | How the 30 Nov plan resolves it |
+| | Scenario A | Scenario B |
 |---|---|---|
-| **March reconciliation error** | Hid it behind an annual ±5% threshold. | 3 engineering days inside T02 to root-cause and fix, with a **declared 18 Sep decision trigger** if diagnosis runs long. Gate criterion moves to **monthly** 0.00%. |
-| **Whitlock PTO (9–20 Oct)** | Scheduled cutover on 12 Oct, mid-PTO, at 160% allocation. | Planned pause. Backfill splits 6d before / 6d after. No task assumes Whitlock is present. |
-| **Vendor freeze (5–19 Oct)** | Scheduled T13 (9d) entirely inside the freeze. | T13 runs 29 Oct – 10 Nov, wholly after the freeze, with the vendor's full 9 working days. |
-| **Finance close (5–16 Oct)** | Assumed Finance would "work around it". | Zero demands during close. UAT from 19 Oct; sign-off 25–26 Nov. |
-| **Dependency inversions** | Four inversions (T08/T05, T04/T13, T07/T06, T03/T02). | Strict network precedence restored; every predecessor finishes before its successor starts. |
-| **Zero float** | 9 of 13 tasks at zero float; no contingency anywhere. | Float declared per task by an explicit, reproducible method; non-critical work carries +1 to +7 days; the critical path is protected by a formal gate. |
-| **Security coverage** | Allocation dropped to 0% from 12 Oct — through cutover and hypercare. | New `T12b` extends Bekele through 26 Nov; RBAC sign-off is a Go criterion. |
-| **Fiscal boundary** | Claimed a clean fiscal break it could not deliver. | Concedes Q1 FY2027 is split by any post-1-Oct date; guarantees **no month is split**, which is what the audit actually tests. |
-| **Rollback** | No rollback plan, and decommission scheduled 2 weeks after go-live. | Dual-run for 30 days, RTO under 2h, pre-authorised triggers, decommission deferred to Jan 2027. |
+| Added duration vs 12 Oct | 50 days (7.1 weeks) | 84 days (12 weeks) |
+| Contractor backfill, legacy loader | **~220 hours** (5.5 FTE-weeks) | **~284 hours** (7.1 FTE-weeks) |
+| Additional engineer | ~9 working days for `T13` | none |
+| Security uplift | Bekele 10% → 60% for 8 working days | Bekele 10% → 75% for 7 working days |
+
+Contractor hours are derived from the run-the-business lines of `resource-allocation.csv` (390 percentage-weeks present in the artifact from 7 Sep to 2 Nov) plus assumed 40% weeks to go-live, not estimated freehand.
+
+**On the inherited budget figure.** August reported *"71% consumed against 74% elapsed"*. Against the committed 12 October cutover, elapsed on 31 August was **68.4%** (91 of 133 calendar days; 68.8% by working days). The 74% only reconciles against a 30 September end date, which was never the committed date. Corrected, the programme was **spending ahead of schedule, not behind it** — the budget green was the same artefact of a fictional baseline as the schedule green. Cloud cost modelling is out of scope; this is staffing burn, which the CFO will ask about.
+
+---
+
+## 7. Defensibility Summary
+
+| Challenge | The 12 October plan | This plan |
+|---|---|---|
+| March revenue defect | Hidden behind an annual ±5% gate. | 3 days inside T02 with an 18 Sep decision trigger. Gate criterion moves to **monthly** 0.00%. |
+| Whitlock PTO 9–20 Oct | Cutover scheduled mid-PTO at 160% allocation. | Planned pause. Backfill splits 6d + 6d. No task assumes he is present. |
+| Vendor freeze 5–19 Oct | `T13` scheduled wholly inside it. | A: 21 Oct – 2 Nov. B: 29 Oct – 10 Nov. Both after the freeze, both with the full 9 days. |
+| Finance close 5–16 Oct | Assumed Finance would "work around it". | Zero demands during close; sign-off well after it in both scenarios. |
+| Dependency inversions | Four (T08/T05, T04/T13, T07/T06, T03/T02). | Strict precedence restored; every predecessor finishes first. |
+| Zero float | 9 of 13 tasks at zero float. | Declared per task by a reproducible method; non-critical work carries +2 to +15 days. |
+| Security coverage | 0% from 12 Oct, through cutover and hypercare. | `T12b` at the FTE the task actually needs; RBAC sign-off is a Go criterion. |
+| Fiscal boundary | Claimed a clean break it could not deliver. | A: no month split. B: no quarter split. Both state plainly what is already lost. |
+| **Peak trading season** | **Not considered at all.** | Cutover moved off it; the peak becomes validation evidence in both scenarios. |
+| Rollback | None, and decommission two weeks after go-live. | 30-day dual run, RTO under 2h, pre-authorised triggers, decommission deferred, vendor v2/v3 dependency named as a gate precondition. |

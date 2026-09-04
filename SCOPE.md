@@ -92,7 +92,7 @@ We must be completely honest with the Steering Committee about the operational i
 2. **What Descoping ACTUALLY Buys the Programme:**
    - **De-risks UAT:** Testing 38 active reports with real business owners is feasible in 2 weeks; testing 120 reports across uninterested teams guarantees testing failure.
    - **Unlocks Developer Capacity for Unbudgeted Commitments:** The inherited plan sized 120 reports at 40 developer days (`project-plan.csv:7`), a unit rate of **0.333 days per report**. At that same rate the 38 active reports are **12.7, rounded to 13 effort days**. Descoping therefore frees **27 effort days of BI Developer M. Okonkwo's time**. This is the single figure used consistently across `PLAN.md` (task T06), `MBR.md` and this document.
-   - **Delivers the FY2027 Studio Scorecard on its promised date:** The freed capacity is scheduled, not merely promised — `PLAN.md` task **T14, 14–30 September, 10 effort days**. FY2027 opens on 1 October, so the Scorecard committed to studio leads by the Head of Studio Relations (`steering-notes-2026-08.md:15-16`) is delivered **on** its commitment rather than missed.
+   - **Delivers the FY2027 Studio Scorecard on its promised date — after asking one question first:** The freed capacity is scheduled, not merely promised — `PLAN.md` task **T14, 14–30 September, 10 effort days**, of which **the first two days are an audit, not a build**. Six studio scorecards already exist and drew 6 views between them in twelve months (§6 below). FY2027 opens on 1 October, so the commitment to the Head of Studio Relations (`steering-notes-2026-08.md:15-16`) is met **on** its date — but met with something the business will actually open.
 
 ---
 
@@ -128,11 +128,54 @@ Step 3: Technical Preservation (COMMITMENT - NOT YET DONE)
 
 ---
 
-## 6. Current Rebuild Status Audit (Question #1 for Okonkwo)
+## 6. The Studio Scorecard Already Exists. Six Times.
 
-* The August status report stated that reporting rebuild was **35% complete** (42 reports rebuilt).
-* `report-usage.csv` does **not** record the build order or flag which reports have been completed.
-* **Audit Action:** Day-One priority #1 is an audit meeting with M. Okonkwo:
-  - If Okonkwo worked sequentially by ID (`RPT-001` through `RPT-042`), then statistically **~20 of the 42 rebuilt reports are zero-view ghosts**.
-  - If Okonkwo prioritized by usage, up to 30+ active reports may already be complete.
-  - Establishing the verified status of the 38 active reports allows us to baseline the exact remaining effort down to the hour.
+Before spending 10 developer days on the scorecard promised to studio leads, the telemetry answers a
+question nobody in the August steering meeting asked.
+
+| Report ID | Name | Views (12m) | Last viewed |
+|---|---|---|---|
+| `RPT-049` | Studio scorecard archive | **0** | never |
+| `RPT-050` | Studio scorecard APAC | 2 | 2025-02-17 |
+| `RPT-051` | Studio scorecard weekly | 1 | 2025-10-17 |
+| `RPT-052` | Studio scorecard detail | **0** | never |
+| `RPT-053` | Studio scorecard EMEA | 1 | 2024-11-11 |
+| `RPT-054` | Studio scorecard (v2) | 2 | 2025-09-24 |
+| | **Six reports** | **6 views total** | **none in 2026** |
+
+Source: `report-usage.csv:50-55`. All six sit in the Studio Ops business area, which holds 12 reports
+in total and contributes **exactly one** report to the active 38 (`RPT-059 Title launch tracker - copy`,
+19 views).
+
+**What this changes.** The Head of Studio Relations did not request a new capability on 26 August; they
+requested the seventh iteration of an asset class with total user abandonment. Building it as specified
+spends 10 developer days producing a report that, on every available piece of evidence, nobody will open.
+
+**What we do instead.** `T14` keeps its 10 days and its 30 September delivery date, but the first two
+are a working session with Studio Relations and two studio leads, not a build:
+
+1. Which decision is a studio lead trying to make that they cannot make today?
+2. Why did `RPT-050` through `RPT-054` stop being opened — wrong grain, wrong cadence, wrong channel,
+   or wrong numbers?
+3. What would a studio lead have to see for this to enter their weekly routine?
+
+The remaining eight days build against those answers. This costs nothing against the schedule and is
+the difference between honouring the commitment and satisfying it.
+
+---
+
+## 7. Current Rebuild Status Audit (Question #1 for Okonkwo)
+
+* The August status report stated the reporting rebuild was **35% complete** — 42 of 120 reports.
+* `report-usage.csv` records **no build order and no completion flag**. Which 42 is unknown.
+* **Audit action, day one:** a status meeting with M. Okonkwo to establish exactly which reports are
+  built.
+  - If the rebuild ran sequentially by ID, the statistical expectation is that **~20 of the 42 are
+    zero-view ghosts** (46.67% of the catalogue carries zero views).
+  - If it was usage-prioritised, much of the active 38 may already be complete.
+  - Either answer lets us baseline the true remaining effort. Until then, the 13-day figure in
+    `PLAN.md` is a worst-case estimate assuming none of the 38 are done.
+
+An earlier draft of this document asserted that **24** of the 42 rebuilt reports were ghosts. That
+number is real — 24 of the first 42 rows carry zero views — but it rests on an assumption about build
+order that no artifact supports. It has been withdrawn. See `AI_WORKFLOW.md` §3.
