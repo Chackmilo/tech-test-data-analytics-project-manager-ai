@@ -4,10 +4,11 @@ Each case corrupts one source of truth, runs the harness, and restores the file.
 A harness that passes every mutation is decorative.
 """
 import io
+import os
 import subprocess
 import sys
 
-ROOT = r'E:\RVS'
+ROOT = os.path.dirname(os.path.abspath(__file__))
 
 CASES = [
     ("PLAN.md", "| T04 | Parallel run | D. Whitlock | 2026-11-03 | 2026-11-16 |",
@@ -38,33 +39,38 @@ CASES = [
      "under-staff security in the budget table while the WBS still says 65%"),
 ]
 
-failed_to_catch = []
-for rel, old, new, description in CASES:
-    path = ROOT + "\\" + rel
-    original = io.open(path, encoding="utf-8").read()
-    if old not in original:
-        print("SKIP  (anchor not found) %s" % description)
-        continue
-    try:
-        io.open(path, "w", encoding="utf-8", newline="\n").write(original.replace(old, new, 1))
-        rc = subprocess.run([sys.executable, "verify.py", "--quiet"], cwd=ROOT,
-                            capture_output=True).returncode
-    finally:
-        io.open(path, "w", encoding="utf-8", newline="\n").write(original)
-    caught = rc != 0
-    print("%s  %s" % ("CAUGHT" if caught else "MISSED", description))
-    if not caught:
-        failed_to_catch.append(description)
+def run_mutation_suite() -> int:
+    failed_to_catch = []
+    for rel, old, new, description in CASES:
+        path = os.path.join(ROOT, rel)
+        original = io.open(path, encoding="utf-8").read()
+        if old not in original:
+            print("SKIP  (anchor not found) %s" % description)
+            continue
+        try:
+            io.open(path, "w", encoding="utf-8", newline="\n").write(original.replace(old, new, 1))
+            rc = subprocess.run([sys.executable, "verify.py", "--quiet"], cwd=ROOT,
+                                capture_output=True).returncode
+        finally:
+            io.open(path, "w", encoding="utf-8", newline="\n").write(original)
+        caught = rc != 0
+        print("%s  %s" % ("CAUGHT" if caught else "MISSED", description))
+        if not caught:
+            failed_to_catch.append(description)
 
-print()
-if failed_to_catch:
-    print("HARNESS IS WEAK - these mutations passed silently:")
-    for d in failed_to_catch:
-        print("  - " + d)
-    sys.exit(1)
-print("All %d mutations caught. The harness can fail." % len(CASES))
+    print()
+    if failed_to_catch:
+        print("HARNESS IS WEAK - these mutations passed silently:")
+        for d in failed_to_catch:
+            print("  - " + d)
+        return 1
+    print("All %d mutations caught. The harness can fail." % len(CASES))
 
-# Confirm the repo is back to a passing state.
-rc = subprocess.run([sys.executable, "verify.py", "--quiet"], cwd=ROOT, capture_output=True).returncode
-print("Repo restored and passing." if rc == 0 else "WARNING: repo left failing after restore!")
-sys.exit(0 if rc == 0 else 1)
+    # Confirm the repo is back to a passing state.
+    rc = subprocess.run([sys.executable, "verify.py", "--quiet"], cwd=ROOT, capture_output=True).returncode
+    print("Repo restored and passing." if rc == 0 else "WARNING: repo left failing after restore!")
+    return 0 if rc == 0 else 1
+
+
+if __name__ == "__main__":
+    sys.exit(run_mutation_suite())
