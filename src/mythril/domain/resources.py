@@ -1,5 +1,6 @@
 """Domain logic for resource allocation matrix, peak over-allocations, and contractor models."""
 
+from datetime import date, timedelta
 from typing import Any, Dict
 
 from mythril.core.harness import VerificationHarness
@@ -32,7 +33,11 @@ def verify_resources(
         ["2026-10-05", "2026-10-12"]
     )
     harness.check("Whitlock weeks planned over 100%", len(over), 8)
-    harness.check("cutover week is one of them", plan_rows["T08"]["planned_start"][:7] in " ".join(over), True)
+    # Resolve the Monday of the week containing cutover and assert THAT week.
+    cutover_day = date.fromisoformat(plan_rows["T08"]["planned_start"])
+    cutover_week = (cutover_day - timedelta(days=cutover_day.weekday())).isoformat()
+    harness.check("the cutover week itself is over-allocated", cutover_week in over, True)
+    harness.check("Whitlock's planned load that week", load("D. Whitlock", cutover_week), 160)
 
     reyes_close = [a for a in alloc if a["person"] == "J. Reyes" and a["workstream"] == "Fiscal year-end close"]
     harness.check("Reyes peak on year-end close (Finding 9)", max(a["pct"] for a in reyes_close), 90)

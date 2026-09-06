@@ -41,12 +41,19 @@ CASES = [
 
 def run_mutation_suite() -> int:
     failed_to_catch = []
+    skipped = []
+    executed = 0
     for rel, old, new, description in CASES:
         path = os.path.join(ROOT, rel)
         original = io.open(path, encoding="utf-8").read()
         if old not in original:
-            print("SKIP  (anchor not found) %s" % description)
+            # Each case is pinned to an exact literal. If that literal has moved,
+            # the case tests nothing. A suite that quietly shrinks while still
+            # announcing success is the precise failure it exists to prevent.
+            print("SKIP  (anchor no longer present) %s" % description)
+            skipped.append(description)
             continue
+        executed += 1
         try:
             io.open(path, "w", encoding="utf-8", newline="\n").write(original.replace(old, new, 1))
             rc = subprocess.run([sys.executable, "verify.py", "--quiet"], cwd=ROOT,
@@ -59,12 +66,20 @@ def run_mutation_suite() -> int:
             failed_to_catch.append(description)
 
     print()
+    if skipped:
+        print("SUITE DEGRADED - %d of %d cases never ran; their anchor text has moved."
+              % (len(skipped), len(CASES)))
+        for d in skipped:
+            print("  - " + d)
+        print("Re-pin each anchor to the current file contents, then re-run.")
+        return 1
     if failed_to_catch:
         print("HARNESS IS WEAK - these mutations passed silently:")
         for d in failed_to_catch:
             print("  - " + d)
         return 1
-    print("All %d mutations caught. The harness can fail." % len(CASES))
+    print("All %d of %d mutations executed and caught. The harness can fail."
+          % (executed, len(CASES)))
 
     # Confirm the repo is back to a passing state.
     rc = subprocess.run([sys.executable, "verify.py", "--quiet"], cwd=ROOT, capture_output=True).returncode

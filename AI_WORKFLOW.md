@@ -61,11 +61,17 @@ it for tautologies and hardcoded expectations. Find what the submission missed."
 ```
 **Returned:** four material defects and four missed findings, including both halves of the error in §3.5. This prompt was worth more than the previous four combined, and it is the reason the recommended date changed. A second run of the same prompt, narrowed to hunt unsupported claims and to attack the harness directly, produced §3.6.
 
+> **On `prompts/`.** The repository also carries a `prompts/` directory. Those are refined
+> templates as they stand *now*, not transcripts of the runs above — the text quoted in this
+> section is what was actually issued. Template 04 has since been given the peak-trading and
+> month-boundary constraints whose absence §3.5 identifies as the cause of a wrong date. Where
+> the two differ, this section is the record and `prompts/` is the correction.
+
 ---
 
 ## 3. Where the AI Was Confidently Wrong
 
-Six failures, all caught by code or by adversarial review. Five share a signature: sound reasoning, correct-looking shape, invented number. The sixth is worse than that, and it is the one worth reading.
+Seven failures, all caught by code or by adversarial review. Five share a signature: sound reasoning, correct-looking shape, invented number. The last two are worse than that, and they are the ones worth reading — both are the verification apparatus failing to verify itself.
 
 ### 3.1 — "24 of the 42 rebuilt reports are ghosts"
 An early draft asserted that of the 42 reports Okonkwo had rebuilt, 24 were zero-view ghosts.
@@ -165,6 +171,62 @@ failing one. If you cannot show the moment your harness said no, you have not te
 
 ---
 
+### 3.7 — The evidence file could report success without running
+
+§3.6 ends on a rule: *a green test suite is a claim, not evidence; the evidence is a failing one.*
+`mutation_test.py` exists to supply that evidence. A multi-agent audit — eight independent lenses over
+structure, code, harness integrity, numbers, brief compliance and results, each finding then handed to
+an adversarial verifier — was pointed at the repository to see what two prior review rounds had left.
+
+It found that `mutation_test.py` could announce success without having run.
+
+```python
+if old not in original:
+    print("SKIP  (anchor not found) %s" % description)
+    continue          # not counted, not recorded
+...
+print("All %d mutations caught." % len(CASES))   # the LIST size, not what executed
+```
+
+Every case is pinned to an exact literal from `PLAN.md` or an artifact. Editing the prose around one
+— which this submission did repeatedly — detaches its anchor. The case then tests nothing, and the
+suite still prints the full tally and exits 0.
+
+Reproduced by detaching five of the eight anchors: **three mutations ran, and the output read "All 8
+mutations caught. The harness can fail."** The file whose entire purpose is to prove the harness can
+fail was itself capable of passing without testing.
+
+Four more defects in the same round, all in checks that read as rigorous:
+
+| Defect | Why it passed review twice |
+|---|---|
+| `"CFO message quotes them too"` passed on a hardcoded `"1 December"` literal; its derived half was False against the real file, and Scenario B was never checked despite the label saying "them" | An `or` with a literal fallback looks like leniency, not like a check that never tests the thing it names |
+| `"cutover week is one of them"` sliced `"2026-10-12"[:7]` to `"2026-10"` and substring-matched a joined list of week starts | Passes if *any* October week is over-allocated — four are, so it cannot fail |
+| The September margin hardcoded `0.70` although `project-plan.csv` carries `percent_complete = 70`, and hardcoded the 80/20 split dates that `PLAN.md` publishes in prose | It produced the right answer, so nothing drew attention to where the inputs came from |
+| A citation check called `read_lines()` unconditionally on a file it had just reported as missing | The failure path was never exercised, because no citation is missing |
+
+**Fixed.** A skipped case now fails the suite with an explicit "SUITE DEGRADED" message naming the
+detached anchors, and the tally reports executed-of-total. The CFO check derives both dates and lists
+any that are missing. The cutover-week check resolves the Monday of the cutover week and asserts that
+specific week. `percent_complete` is read from the CSV; the 80/20 split and its cut-off are parsed
+from `PLAN.md`, so editing either breaks the build. The unfalsifiable 1 January assertion is replaced
+by one that makes the declared holiday load-bearing. The harness now runs **281 checks**, and the
+degradation guard is itself tested: detaching one anchor exits 1.
+
+**One honest note on method.** The audit hit a session limit partway through: five of eight lenses
+completed and every adversarial verifier died before returning. The findings above therefore arrived
+unverified, from a single source. Each was reproduced by hand before any of it was acted on — which
+is how one reported defect (`python -m mythril` said to fail on a cold clone) was found not to
+reproduce and discarded. An audit that dies halfway is not a verdict; it is a list of leads.
+
+**What §3.6 got wrong.** It concluded that the failure recurred *because the fix was verified by the
+same process that needed fixing*. That was right and insufficient. The deeper pattern is that each
+round hardened the thing under test and left the thing doing the testing unexamined — first the
+documents, then the harness, then the mutation suite. There is always one more layer holding the
+ladder, and it is never the one being audited.
+
+---
+
 ## 4. How the CSVs Were Analysed, and How the Output Was Checked
 
 **Rule 1: never ask the model for arithmetic.** Questions like *"how many reports have zero views?"* were never answered by generation. The model wrote a script; the script answered.
@@ -189,13 +251,14 @@ CAUGHT  move the technical cutover ONTO the Black Friday weekend
 CAUGHT  change the recommended go-live to a mid-month date that splits December
 CAUGHT  under-staff security in the budget table while the WBS still says 65%
 
-All 8 mutations caught. The harness can fail.
+All 8 of 8 mutations executed and caught. The harness can fail.
 ```
 
 The last three came from an external audit and **all three passed silently before the fix in
 §3.6**. They are permanent cases now: a mutation suite that omits the attack you have already
-suffered is decoration.
+suffered is decoration. Since §3.7 the suite also fails if any case is skipped, because a tally that
+counts cases rather than executions is decoration of a subtler kind.
 
-The rebuilt harness runs **276 checks across all eight artifacts and all six deliverables**. During its own construction it caught four further defects in documents that had already been reviewed twice: a task window that could not satisfy its own published float, a security task staffed at 60% when its effort needed 62.5%, a task spanning the PTO it was supposed to avoid, and a citation count that had gone stale.
+The rebuilt harness runs **281 checks across all eight artifacts and all six deliverables**. During its own construction it caught four defects in documents that had already been reviewed twice: a task window that could not satisfy its own published float, a security task staffed at 60% when its effort needed 62.5%, a task spanning the PTO it was supposed to avoid, and a citation count that had gone stale. A later multi-agent audit of the harness itself found five more, documented in §3.7.
 
 **The test of everything above is one command.** Run `python verify.py`. If a number in any deliverable is not in its output, that number should not be believed — including by the person who wrote it.

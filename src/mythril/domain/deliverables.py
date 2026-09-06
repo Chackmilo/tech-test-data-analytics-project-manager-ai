@@ -44,7 +44,10 @@ def verify_deliverables(
     )
     for fname, spans in citation_matches:
         path = os.path.join(art_dir, fname)
-        harness.check(f"cited artifact exists: {fname}", os.path.exists(path), True)
+        exists = os.path.exists(path)
+        harness.check(f"cited artifact exists: {fname}", exists, True)
+        if not exists:
+            continue
         file_lines = read_lines(fname, art_dir)
         n_lines = len(file_lines)
         for span in re.findall(r"\d+(?:-\d+)?", spans):

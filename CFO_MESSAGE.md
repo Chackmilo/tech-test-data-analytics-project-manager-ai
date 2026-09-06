@@ -13,9 +13,9 @@ August's reconciliation passed a ±5% gate on annual totals. Underneath it, **Ma
 
 Straight about what is recoverable: FY2027 Q1 is October–December, so any date after 1 October splits the quarter. That is gone. Below it, you have a choice:
 
-**Fund one more engineer for the vendor migration and we go live Tuesday 1 December.** November closes on legacy, December opens on the new platform, no month split. Seven weeks.
+**Fund one more engineer for the vendor migration and we go live Tuesday 1 December 2026.** November closes on legacy, December opens on the new platform, no month split. Seven weeks.
 
-**Decline it and we go live Monday 4 January.** Twelve weeks, but it buys back the quarter: Q1 on legacy, Q2 on the new warehouse.
+**Decline it and we go live Monday 4 January 2027.** Twelve weeks, but it buys back the quarter: Q1 on legacy, Q2 on the new warehouse.
 
 I am not proposing 30 November: it is November's last business day, so it splits the month, and it lands on Cyber Monday with the cutover weekend on Black Friday. Under both plans that weekend runs on the new platform while legacy stays the book of record — our busiest days become the proof the migration works.
 

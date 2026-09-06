@@ -5,6 +5,7 @@ from datetime import date, timedelta
 from typing import Any, Dict, List, Tuple
 
 from mythril.core.calendar import (
+    DECLARED_HOLIDAYS,
     MONTHS,
     first_business_day,
     spell_date,
@@ -144,10 +145,10 @@ def verify_revised_plan(
     )
     cfo_txt = read_text("CFO_MESSAGE.md", root_dir)
     harness.check(
-        "CFO message quotes them too",
-        spell_date(golive_a) in cfo_txt.replace("Tuesday ", "").replace("Monday ", "")
-        or "1 December" in cfo_txt,
-        True
+        "CFO message quotes both go-live dates",
+        [spell_date(d) for d in (golive_a, golive_b)
+         if spell_date(d) not in cfo_txt.replace("Tuesday ", "").replace("Monday ", "")],
+        []
     )
 
     for label, gl in [("A", golive_a), ("B", golive_b)]:
@@ -166,10 +167,19 @@ def verify_revised_plan(
     harness.check("Scenario A go-live parsed as", golive_a, date(2026, 12, 1))
     harness.check("Scenario B go-live is a Monday", golive_b.strftime("%a"), "Mon")
     harness.check("Scenario B go-live parsed as", golive_b, date(2027, 1, 4))
+    # A weekday-only test here could not fail. Make the declared holiday
+    # load-bearing instead: it matters precisely because 1 Jan is a weekday,
+    # and without the declaration Scenario B would land on it.
+    ny = date(2027, 1, 1)
     harness.check(
-        "1 Jan 2027 falls on a Friday, so the New Year holiday buffers go-live",
-        date(2027, 1, 1).strftime("%a"),
-        "Fri"
+        "the declared New Year holiday falls on a working weekday",
+        ny in DECLARED_HOLIDAYS and ny.weekday() < 5,
+        True
+    )
+    harness.check(
+        "so without that declaration Scenario B would land on 1 January",
+        min(d for d in (date(2027, 1, x) for x in range(1, 8)) if d.weekday() < 5),
+        ny
     )
     harness.check(
         "Scenario B cutover window sits in the year-end shutdown",
@@ -185,9 +195,29 @@ def verify_revised_plan(
     harness.check("slip to Scenario B (weeks)", round((golive_b - date.fromisoformat(cutover)).days / 7.0, 1), 12.0)
 
     t02 = wbs["T02"]
-    remaining = round((1 - 0.70) * t02[2], 1)
-    capacity = round(workdays("2026-09-01", "2026-09-18") * 0.8 + workdays("2026-09-21", "2026-09-30"), 1)
-    harness.check("T02 effort remaining at 70% complete", remaining, 17.4)
+    # percent_complete is in project-plan.csv; read it rather than restating it.
+    pct_done = int(plan_rows["T02"]["percent_complete"]) / 100.0
+    harness.check("T02 completion read from project-plan.csv", pct_done, 0.70)
+    remaining = round((1 - pct_done) * t02[2], 1)
+    # The 80/20 split and its cut-off are published in PLAN.md section 4.
+    # Parse them, so editing either one breaks this check.
+    split = re.search(r"Through (\d{1,2}) (\w+): \*\*(\d+)% T02", plan_md)
+    resume_m = re.search(r"From (\d{1,2}) (\w+): 100% T02", plan_md)
+    harness.check(
+        "PLAN.md publishes the September split and its resume date",
+        split is not None and resume_m is not None,
+        True
+    )
+    cutoff = date(2026, MONTHS[split.group(2)], int(split.group(1)))
+    resume = date(2026, MONTHS[resume_m.group(2)], int(resume_m.group(1)))
+    t02_share = int(split.group(3)) / 100.0
+    harness.check("the split runs to 18 September at 80% on T02",
+                  (cutoff.isoformat(), t02_share), ("2026-09-18", 0.8))
+    capacity = round(
+        workdays("2026-09-01", cutoff.isoformat()) * t02_share
+        + workdays(resume.isoformat(), t02[1]), 1
+    )
+    harness.check("T02 effort remaining at that completion", remaining, 17.4)
     harness.check("Whitlock September effective capacity", capacity, 19.2)
     harness.check("September margin (days)", round(capacity - remaining, 1), 1.8)
 
