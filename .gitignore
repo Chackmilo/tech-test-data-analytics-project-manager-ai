@@ -60,3 +60,6 @@ dmypy.json
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Claude Code session scratch (worktrees, transcripts)
+.claude/
