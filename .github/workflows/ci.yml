@@ -36,7 +36,7 @@ jobs:
         run: |
           ruff check src/ tests/ verify.py mutation_test.py
 
-      - name: Run deterministic verification harness (281 checks)
+      - name: Run deterministic verification harness (283 checks)
         run: |
           python verify.py
 

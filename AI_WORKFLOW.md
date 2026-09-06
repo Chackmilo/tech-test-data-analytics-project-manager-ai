@@ -210,7 +210,7 @@ detached anchors, and the tally reports executed-of-total. The CFO check derives
 any that are missing. The cutover-week check resolves the Monday of the cutover week and asserts that
 specific week. `percent_complete` is read from the CSV; the 80/20 split and its cut-off are parsed
 from `PLAN.md`, so editing either breaks the build. The unfalsifiable 1 January assertion is replaced
-by one that makes the declared holiday load-bearing. The harness now runs **281 checks**, and the
+by one that makes the declared holiday load-bearing. The harness now runs **283 checks**, and the
 degradation guard is itself tested: detaching one anchor exits 1.
 
 **One honest note on method.** The audit hit a session limit partway through: five of eight lenses
@@ -259,6 +259,6 @@ The last three came from an external audit and **all three passed silently befor
 suffered is decoration. Since §3.7 the suite also fails if any case is skipped, because a tally that
 counts cases rather than executions is decoration of a subtler kind.
 
-The rebuilt harness runs **281 checks across all eight artifacts and all six deliverables**. During its own construction it caught four defects in documents that had already been reviewed twice: a task window that could not satisfy its own published float, a security task staffed at 60% when its effort needed 62.5%, a task spanning the PTO it was supposed to avoid, and a citation count that had gone stale. A later multi-agent audit of the harness itself found five more, documented in §3.7.
+The rebuilt harness runs **283 checks across all eight artifacts and all six deliverables**. During its own construction it caught four defects in documents that had already been reviewed twice: a task window that could not satisfy its own published float, a security task staffed at 60% when its effort needed 62.5%, a task spanning the PTO it was supposed to avoid, and a citation count that had gone stale. A later multi-agent audit of the harness itself found five more, documented in §3.7.
 
 **The test of everything above is one command.** Run `python verify.py`. If a number in any deliverable is not in its output, that number should not be believed — including by the person who wrote it.

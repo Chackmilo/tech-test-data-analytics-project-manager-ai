@@ -30,6 +30,22 @@ def verify_deliverables(
     for name in DELIVERABLES:
         harness.check(f"{name} exists", os.path.exists(os.path.join(root_dir, name)), True)
 
+    # The brief requires the deliverables at the repository root. Anything else
+    # sitting there competes with them for a reviewer's attention, so the root
+    # markdown set is asserted to be exactly the brief plus the six documents.
+    # Supporting prose belongs in docs/.
+    root_md = sorted(f for f in os.listdir(root_dir) if f.endswith(".md"))
+    harness.check(
+        "root holds only the brief and the six deliverables",
+        root_md,
+        sorted(["README.md"] + list(DELIVERABLES)),
+    )
+    harness.check(
+        "README.md is present and is the brief, not a deliverable",
+        "README.md" in root_md and "README.md" not in DELIVERABLES,
+        True,
+    )
+
     cfo_words = len(read_text("CFO_MESSAGE.md", root_dir).split())
     harness.check(f"CFO_MESSAGE.md is under the 300-word brief limit ({cfo_words})", cfo_words < 300, True)
 

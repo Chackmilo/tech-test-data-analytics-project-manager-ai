@@ -6,7 +6,7 @@ help:
 	@echo "Mythril Programme Verification & Engineering Harness"
 	@echo "====================================================="
 	@echo "Available commands:"
-	@echo "  make verify   - Run the 281-check deterministic verification audit"
+	@echo "  make verify   - Run the 283-check deterministic verification audit"
 	@echo "  make mutate   - Run the 8-case adversarial mutation test suite"
 	@echo "  make test     - Run tests via pytest (or fallback to verify + mutate)"
 	@echo "  make lint     - Check code quality with ruff (if installed)"
