@@ -61,11 +61,11 @@ it for tautologies and hardcoded expectations. Find what the submission missed."
 ```
 **Returned:** four material defects and four missed findings, including both halves of the error in §3.5. This prompt was worth more than the previous four combined, and it is the reason the recommended date changed. A second run of the same prompt, narrowed to hunt unsupported claims and to attack the harness directly, produced §3.6.
 
-> **On `prompts/`.** The repository also carries a `prompts/` directory. Those are refined
+> **On `analysis/prompts/`.** The repository also carries an `analysis/prompts/` directory. Those are refined
 > templates as they stand *now*, not transcripts of the runs above — the text quoted in this
 > section is what was actually issued. Template 04 has since been given the peak-trading and
 > month-boundary constraints whose absence §3.5 identifies as the cause of a wrong date. Where
-> the two differ, this section is the record and `prompts/` is the correction.
+> the two differ, this section is the record and `analysis/prompts/` is the correction.
 
 ---
 

@@ -27,18 +27,19 @@ import os
 import subprocess
 import sys
 
-# Ensure modular src package is importable without requiring pre-installation
+# The audit engine lives in analysis/ so the repository root carries only the brief,
+# the six deliverables, the given artifacts, and the one command those documents cite.
 ROOT = os.path.dirname(os.path.abspath(__file__))
-SRC_DIR = os.path.join(ROOT, "src")
-if SRC_DIR not in sys.path:
-    sys.path.insert(0, SRC_DIR)
+PKG_DIR = os.path.join(ROOT, "analysis")
+if PKG_DIR not in sys.path:
+    sys.path.insert(0, PKG_DIR)
 
 from mythril.engine import AuditEngine  # noqa: E402  (import follows the sys.path bootstrap above)
 
 
 def main() -> int:
     if "--selftest" in sys.argv:
-        mutation_script = os.path.join(ROOT, "mutation_test.py")
+        mutation_script = os.path.join(ROOT, "analysis", "mutation_test.py")
         res = subprocess.run([sys.executable, mutation_script], cwd=ROOT)
         return res.returncode
 

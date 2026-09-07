@@ -33,7 +33,7 @@ def verify_deliverables(
     # The brief requires the deliverables at the repository root. Anything else
     # sitting there competes with them for a reviewer's attention, so the root
     # markdown set is asserted to be exactly the brief plus the six documents.
-    # Supporting prose belongs in docs/.
+    # Supporting prose and the harness itself live in analysis/.
     root_md = sorted(f for f in os.listdir(root_dir) if f.endswith(".md"))
     harness.check(
         "root holds only the brief and the six deliverables",

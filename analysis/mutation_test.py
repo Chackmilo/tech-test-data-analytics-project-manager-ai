@@ -8,19 +8,21 @@ import os
 import subprocess
 import sys
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
+# This file sits in analysis/; every case path and the harness it drives are
+# addressed from the repository root one level up.
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 CASES = [
     ("PLAN.md", "| T04 | Parallel run | D. Whitlock | 2026-11-03 | 2026-11-16 |",
      "| T04 | Parallel run | D. Whitlock | 2026-11-03 | 2026-11-13 |",
      "shorten a critical-path task window in PLAN.md by 3 days"),
-    (r"artifacts\reconciliation-2026-08-28.md", "| Mar 2026 | 119,882.64 | 179,607.56 | +49.82% |",
+    ("artifacts/reconciliation-2026-08-28.md", "| Mar 2026 | 119,882.64 | 179,607.56 | +49.82% |",
      "| Mar 2026 | 119,882.64 | 129,607.56 | +49.82% |",
      "alter the March revenue figure in the artifact"),
-    (r"artifacts\vendor-notice.md", "through Monday 19 October 2026",
+    ("artifacts/vendor-notice.md", "through Monday 19 October 2026",
      "through Monday 30 October 2026",
      "extend the vendor freeze so T13 now starts inside it"),
-    (r"artifacts\report-usage.csv", "RPT-049,Studio scorecard archive",
+    ("artifacts/report-usage.csv", "RPT-049,Studio scorecard archive",
      "RPT-049,Studio dashboard archive",
      "rename a scorecard so Finding 12's count drops to 5"),
     ("PLAN.md", "R. Bekele **at 65%**", "R. Bekele **at 15%**",

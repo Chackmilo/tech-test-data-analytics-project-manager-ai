@@ -10,7 +10,8 @@ from mythril.engine import AuditEngine
 @pytest.fixture(scope="session")
 def root_dir() -> Path:
     """Fixture returning the root directory of the repository."""
-    return Path(__file__).resolve().parent.parent
+    # analysis/tests/conftest.py -> analysis/tests -> analysis -> repository root
+    return Path(__file__).resolve().parent.parent.parent
 
 
 @pytest.fixture(scope="session")

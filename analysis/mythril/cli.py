@@ -12,7 +12,7 @@ def run_selftest(root_dir: str) -> int:
     # Import mutation test cases dynamically
     import subprocess
 
-    mutation_script = os.path.join(root_dir, "mutation_test.py")
+    mutation_script = os.path.join(root_dir, "analysis", "mutation_test.py")
     if not os.path.exists(mutation_script):
         print(f"Error: mutation script not found at {mutation_script}")
         return 1
@@ -36,7 +36,7 @@ def main() -> int:
         "--root",
         type=str,
         default=None,
-        help="Path to repository root (defaults to directory containing src/)."
+        help="Path to repository root (defaults to the directory above analysis/)."
     )
     parser.add_argument(
         "--selftest",

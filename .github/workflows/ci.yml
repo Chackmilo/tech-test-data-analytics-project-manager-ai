@@ -25,16 +25,18 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
-          cache-dependency-path: "pyproject.toml"
+          cache-dependency-path: "analysis/pyproject.toml"
 
       - name: Install dependencies
+        working-directory: analysis
         run: |
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
 
       - name: Lint codebase with Ruff
+        working-directory: analysis
         run: |
-          ruff check src/ tests/ verify.py mutation_test.py
+          ruff check mythril/ tests/ mutation_test.py ../verify.py
 
       - name: Run deterministic verification harness (283 checks)
         run: |
@@ -42,8 +44,9 @@ jobs:
 
       - name: Run adversarial mutation test suite (8 cases)
         run: |
-          python mutation_test.py
+          python analysis/mutation_test.py
 
       - name: Run pytest test suite
+        working-directory: analysis
         run: |
           pytest -v

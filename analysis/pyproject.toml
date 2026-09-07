@@ -5,8 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "mythril-audit"
 version = "1.0.0"
-description = "Deterministic audit and verification engine for the Mythril Programme assessment"
-readme = "README.md"
+description = "Verification harness for the Mythril Programme assessment deliverables"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [
@@ -34,12 +33,13 @@ dev = [
 mythril = "mythril.cli:main"
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["."]
+include = ["mythril*"]
 
 [tool.pytest.ini_options]
 minversion = "7.0"
 testpaths = ["tests"]
-pythonpath = ["src", "."]
+pythonpath = [".", ".."]
 addopts = "-ra --strict-markers"
 
 [tool.ruff]
