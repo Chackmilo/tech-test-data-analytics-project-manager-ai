@@ -39,7 +39,7 @@ Key questions:
 ```
 
 ## Deterministic Guardrail Check
-Verified by `src/mythril/domain/inherited_plan.py` & `src/mythril/domain/resources.py`:
+Verified by `analysis/mythril/domain/inherited_plan.py` & `analysis/mythril/domain/resources.py`:
 - `Whitlock peak allocation == 160% in weeks of 2026-10-05 and 2026-10-12`
 - `Whitlock tasks overlapping PTO (8 business days) == ['T04', 'T08', 'T09', 'T13']`
 - `T13 planned window sits wholly inside vendor freeze (2026-10-05 to 2026-10-19)`

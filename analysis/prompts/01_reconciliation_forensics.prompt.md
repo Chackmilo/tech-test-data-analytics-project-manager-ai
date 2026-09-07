@@ -37,7 +37,7 @@ Key questions:
 ```
 
 ## Deterministic Guardrail Check
-Verified by `src/mythril/domain/reconciliation.py`:
+Verified by `analysis/mythril/domain/reconciliation.py`:
 - `FY2026 variance in USD == $59,724.92 (+4.05%)`
 - `March 2026 variance in USD == $59,724.92 (+49.82%)`
 - `Phantom order count == 2,998 orders ($19.9216 / order)`

@@ -41,7 +41,7 @@ Identify the earliest defensible go-live dates for both funded scenarios (Scenar
 ```
 
 ## Deterministic Guardrail Check
-Verified by `src/mythril/domain/revised_plan.py`:
+Verified by `analysis/mythril/domain/revised_plan.py`:
 - `Scenario A Go-Live: Tuesday 1 December 2026 (7.1 weeks slip from committed 12 Oct)`
 - `Scenario B Go-Live: Monday 4 January 2027 (12.0 weeks slip from committed 12 Oct)`
 - `Peak trading window derived dynamically: 2026-11-26 to 2026-11-30 (cleared by cutovers)`

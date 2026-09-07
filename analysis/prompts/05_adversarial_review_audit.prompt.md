@@ -21,7 +21,7 @@ Act as a skeptical external auditor or assessor grading the entire submission ag
 
 ## Target Deliverables & Artifacts
 - All deliverables: `ASSESSMENT.md`, `PLAN.md`, `SCOPE.md`, `MBR.md`, `CFO_MESSAGE.md`
-- Codebase: `verify.py`, `mutation_test.py`, `src/mythril/`
+- Codebase: `verify.py`, `analysis/mutation_test.py`, `analysis/mythril/`
 
 ## System Prompt / Instructions
 ```text
@@ -38,7 +38,7 @@ Specifically audit:
 ```
 
 ## Deterministic Guardrail Check
-Verified by `mutation_test.py` & `src/mythril/domain/deliverables.py`:
+Verified by `analysis/mutation_test.py` & `analysis/mythril/domain/deliverables.py`:
 - `8 of 8 adversarial mutations caught`
 - `CFO_MESSAGE.md word count < 300 (actual: 292 words)`
 - `Findings count == 16, all 16 citing valid line ranges in real artifacts`

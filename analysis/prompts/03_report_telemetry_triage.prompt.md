@@ -38,7 +38,7 @@ Calculate:
 ```
 
 ## Deterministic Guardrail Check
-Verified by `src/mythril/domain/telemetry.py`:
+Verified by `analysis/mythril/domain/telemetry.py`:
 - `Total reports == 120 | Total views == 2,309`
 - `Zero-view reports == 56 (46.67% of catalogue)`
 - `Active 2026 reports == 38 (holding 2,270 views, 98.31% of all usage)`

@@ -239,7 +239,7 @@ ladder, and it is never the one being audited.
 - opens each citation in `ASSESSMENT.md` and confirms the file and the line range exist;
 - derives constraints rather than asserting them — the peak-trading window is computed from the calendar (fourth Thursday of November), not typed in.
 
-**Rule 3: prove the test can fail.** A passing suite is not evidence unless it fails when the truth changes. `mutation_test.py` corrupts one source of truth at a time and confirms the harness notices:
+**Rule 3: prove the test can fail.** A passing suite is not evidence unless it fails when the truth changes. `analysis/mutation_test.py`, run with `python verify.py --selftest`, corrupts one source of truth at a time and confirms the harness notices:
 
 ```text
 CAUGHT  shorten a critical-path task window in PLAN.md by 3 days
